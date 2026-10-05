@@ -1,0 +1,64 @@
+{
+  "name": "my-game",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.12.1",
+  "gameInstance": {
+    "gameContractVersion": "1.0.0",
+    "development": {
+      "schemaVersion": 1,
+      "toolkit": "gameinstance",
+      "distribution": "bundled",
+      "sdkVersion": "0.3.0",
+      "sdkIdentity": "sha256:6d8c1939368f6ea607bba6c0fdc96b03ac871e0c4640afa83b74724310182ce7",
+      "capabilities": [
+        "local-simulator",
+        "inspector",
+        "state-editing",
+        "rewind",
+        "scenarios",
+        "runtime-check"
+      ]
+    },
+    "orchestrator": {
+      "pollSubscribers": false
+    },
+    "setConfigPayload": {
+      "game": {
+        "roundSeconds": 300,
+        "revealSeconds": 10
+      }
+    }
+  },
+  "scripts": {
+    "bootstrap": "node scripts/bootstrap.mjs",
+    "doctor": "node scripts/bootstrap.mjs --check",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:scenarios": "vitest run src/scenarios.test.ts",
+    "check:runtime": "gameinstance-dev runtime-check",
+    "runtime:build": "node scripts/build-runtime.mjs",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "dev": "gameinstance-dev dev",
+    "dev:game": "vite",
+    "dev:container": "node scripts/runtime-start.mjs"
+  },
+  "dependencies": {
+    "@repo/game-kit": "workspace:*",
+    "@repo/protocol": "workspace:*",
+    "zod": "^3.25.67",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@repo/game-dev": "workspace:*",
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.2.4"
+  }
+}

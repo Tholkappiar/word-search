@@ -1,0 +1,4 @@
+packages:
+  - "vendor/gameinstance/packages/protocol"
+  - "vendor/gameinstance/packages/game-kit"
+  - "vendor/gameinstance/packages/game-dev"
