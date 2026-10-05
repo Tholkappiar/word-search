@@ -1,0 +1,46 @@
+{
+  "name": "@repo/game-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./src/browser.ts",
+      "default": "./dist/browser.js"
+    },
+    "./engine": {
+      "types": "./src/engine.ts",
+      "default": "./dist/engine.js"
+    },
+    "./react": {
+      "types": "./src/react.tsx",
+      "default": "./dist/react.js"
+    },
+    "./vite": {
+      "types": "./src/vite.ts",
+      "default": "./dist/vite.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsc -w -p tsconfig.json --preserveWatchOutput"
+  },
+  "dependencies": {
+    "@repo/protocol": "workspace:*",
+    "react": "^19.1.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.8",
+    "vitest": "^3.2.4"
+  }
+}

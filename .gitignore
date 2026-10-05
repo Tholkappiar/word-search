@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+*.tsbuildinfo
+.gameinstance/
+artifacts/
+.DS_Store
