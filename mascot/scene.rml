@@ -1,0 +1,280 @@
+<Rive version="1" kind="fragment">
+    <!-- Hoot, the wizard owl who hosts Enchanted Words.
+
+         The game drives three view model numbers every frame:
+           mouth  0..1   how open the mouth is (lip sync from the voice's loudness)
+           jaw    px     where the lower beak sits: 30 closed, 66 wide open
+           look   px     where the pupils glance, left or right
+         Two state machine layers run on their own: an idle bob with wing flaps
+         and a swaying hat, and a blink every few seconds.
+
+         Draw order: the first sibling draws on top. -->
+    <Artboard defaultStateMachineId="0:7" viewModelId="0:40" width="400" height="440" styleId="0:5" name="Hoot" id="0:2">
+        <LayoutComponentStyle name="Artboard Style" id="0:5"/>
+
+        <Node x="200" y="270" name="Owl" id="0:10">
+            <!-- Wizard hat, tilted, in front of everything. -->
+            <Node y="-148" rotation="-0.12" name="Hat" id="0:11">
+                <Shape x="8" y="-52" rotation="0.2" name="Hat Star">
+                    <Star width="26" height="26" points="5" innerRadius="0.45" name="Path"/>
+                    <Fill name="Fill"><SolidColor colorValue="FFFFD95A" name="Color"/></Fill>
+                </Shape>
+                <Shape x="-20" y="-20" name="Hat Dot">
+                    <Ellipse width="9" height="9" name="Path"/>
+                    <Fill name="Fill"><SolidColor colorValue="FFFFE9A8" name="Color"/></Fill>
+                </Shape>
+                <Shape y="2" name="Hat Band">
+                    <Rectangle width="96" height="16" cornerRadiusTL="4" name="Path"/>
+                    <Fill name="Fill"><SolidColor colorValue="FFF3C64C" name="Color"/></Fill>
+                </Shape>
+                <Shape y="-44" name="Hat Cone">
+                    <Triangle width="100" height="112" name="Path"/>
+                    <Fill name="Fill">
+                        <LinearGradient startX="-50" startY="-56" endX="40" endY="56" name="Gradient">
+                            <GradientStop colorValue="FF8B5CF6" position="0"/>
+                            <GradientStop colorValue="FF4C1D95" position="1"/>
+                        </LinearGradient>
+                    </Fill>
+                </Shape>
+                <Shape y="12" name="Hat Brim">
+                    <Ellipse width="164" height="32" name="Path"/>
+                    <Fill name="Fill"><SolidColor colorValue="FF3B1673" name="Color"/></Fill>
+                </Shape>
+            </Node>
+
+            <!-- Face: beak, mouth and eyes, raised above the body's centre. -->
+            <Node y="-40" name="Face" id="0:12">
+                <Shape y="22" rotation="3.1415927" name="Upper Beak">
+                    <Triangle width="38" height="30" name="Path"/>
+                    <Fill name="Fill">
+                        <LinearGradient startY="-15" endY="15" name="Gradient">
+                            <GradientStop colorValue="FFFFC24D" position="0"/>
+                            <GradientStop colorValue="FFF08A1C" position="1"/>
+                        </LinearGradient>
+                    </Fill>
+                </Shape>
+                <Node y="30" name="Lower Beak" id="0:14">
+                    <DataBindContext sourcePathIds="0:40-0:42" propertyKey="14"/>
+                    <Shape rotation="3.1415927" name="Lower Beak Shape">
+                        <Triangle width="26" height="16" name="Path"/>
+                        <Fill name="Fill"><SolidColor colorValue="FFD9741A" name="Color"/></Fill>
+                    </Shape>
+                </Node>
+                <Node y="46" scaleY="0.05" name="Mouth" id="0:13">
+                    <DataBindContext sourcePathIds="0:40-0:41" propertyKey="17"/>
+                    <Shape y="10" name="Tongue">
+                        <Ellipse width="28" height="14" name="Path"/>
+                        <Fill name="Fill"><SolidColor colorValue="FFFF7A93" name="Color"/></Fill>
+                    </Shape>
+                    <Shape name="Mouth Inside">
+                        <Ellipse width="56" height="46" name="Path"/>
+                        <Fill name="Fill"><SolidColor colorValue="FF3B1208" name="Color"/></Fill>
+                    </Shape>
+                </Node>
+                <Node name="Eyes" id="0:15">
+                    <Node name="Pupils" id="0:16">
+                        <DataBindContext sourcePathIds="0:40-0:43" propertyKey="13"/>
+                        <Shape x="-38" y="-11" name="Shine L">
+                            <Ellipse width="12" height="12" name="Path"/>
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="Color"/></Fill>
+                        </Shape>
+                        <Shape x="54" y="-11" name="Shine R">
+                            <Ellipse width="12" height="12" name="Path"/>
+                            <Fill name="Fill"><SolidColor colorValue="FFFFFFFF" name="Color"/></Fill>
+                        </Shape>
+                        <Shape x="-46" y="-2" name="Pupil L">
+                            <Ellipse width="38" height="38" name="Path"/>
+                            <Fill name="Fill"><SolidColor colorValue="FF1E120A" name="Color"/></Fill>
+                        </Shape>
+                        <Shape x="46" y="-2" name="Pupil R">
+                            <Ellipse width="38" height="38" name="Path"/>
+                            <Fill name="Fill"><SolidColor colorValue="FF1E120A" name="Color"/></Fill>
+                        </Shape>
+                    </Node>
+                    <Shape x="-46" name="Eye L">
+                        <Ellipse width="80" height="80" name="Path"/>
+                        <Fill name="Fill"><SolidColor colorValue="FFFFFDF2" name="Color"/></Fill>
+                        <Stroke thickness="7" name="Ring"><SolidColor colorValue="FFF0B93A" name="Color"/></Stroke>
+                    </Shape>
+                    <Shape x="46" name="Eye R">
+                        <Ellipse width="80" height="80" name="Path"/>
+                        <Fill name="Fill"><SolidColor colorValue="FFFFFDF2" name="Color"/></Fill>
+                        <Stroke thickness="7" name="Ring"><SolidColor colorValue="FFF0B93A" name="Color"/></Stroke>
+                    </Shape>
+                </Node>
+                <Shape x="-46" y="6" name="Face Disc L">
+                    <Ellipse width="112" height="108" name="Path"/>
+                    <Fill name="Fill"><SolidColor colorValue="FFEBD3A6" name="Color"/></Fill>
+                </Shape>
+                <Shape x="46" y="6" name="Face Disc R">
+                    <Ellipse width="112" height="108" name="Path"/>
+                    <Fill name="Fill"><SolidColor colorValue="FFEBD3A6" name="Color"/></Fill>
+                </Shape>
+            </Node>
+
+            <!-- Rosy cheeks. -->
+            <Shape x="-86" y="10" opacity="0.55" name="Cheek L">
+                <Ellipse width="30" height="16" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFFF8FA3" name="Color"/></Fill>
+            </Shape>
+            <Shape x="86" y="10" opacity="0.55" name="Cheek R">
+                <Ellipse width="30" height="16" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFFF8FA3" name="Color"/></Fill>
+            </Shape>
+
+            <!-- Ear tufts. -->
+            <Shape x="-84" y="-118" rotation="-0.4" name="Ear L">
+                <Triangle width="46" height="62" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FF7A4A22" name="Color"/></Fill>
+            </Shape>
+            <Shape x="84" y="-118" rotation="0.4" name="Ear R">
+                <Triangle width="46" height="62" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FF7A4A22" name="Color"/></Fill>
+            </Shape>
+
+            <!-- Belly with soft feather marks. -->
+            <Shape x="-28" y="58" name="Feather 1">
+                <Ellipse width="16" height="8" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFD8B47E" name="Color"/></Fill>
+            </Shape>
+            <Shape x="22" y="62" name="Feather 2">
+                <Ellipse width="16" height="8" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFD8B47E" name="Color"/></Fill>
+            </Shape>
+            <Shape x="-4" y="90" name="Feather 3">
+                <Ellipse width="16" height="8" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFD8B47E" name="Color"/></Fill>
+            </Shape>
+            <Shape x="-34" y="102" name="Feather 4">
+                <Ellipse width="14" height="7" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFD8B47E" name="Color"/></Fill>
+            </Shape>
+            <Shape x="30" y="104" name="Feather 5">
+                <Ellipse width="14" height="7" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFD8B47E" name="Color"/></Fill>
+            </Shape>
+            <Shape y="70" name="Belly">
+                <Ellipse width="156" height="150" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFF6E6C4" name="Color"/></Fill>
+            </Shape>
+
+            <Shape y="10" name="Body">
+                <Ellipse width="252" height="282" name="Path"/>
+                <Fill name="Fill">
+                    <LinearGradient startY="-141" endY="141" name="Gradient">
+                        <GradientStop colorValue="FFA36B36" position="0"/>
+                        <GradientStop colorValue="FF6B4220" position="1"/>
+                    </LinearGradient>
+                </Fill>
+            </Shape>
+
+            <!-- Wings behind the body, pivoting near the shoulder. -->
+            <Node x="-110" y="-10" rotation="0.25" name="Wing L" id="0:17">
+                <Shape y="62" name="Wing L Shape">
+                    <Ellipse width="74" height="150" name="Path"/>
+                    <Fill name="Fill"><SolidColor colorValue="FF5E3A1B" name="Color"/></Fill>
+                </Shape>
+            </Node>
+            <Node x="110" y="-10" rotation="-0.25" name="Wing R" id="0:18">
+                <Shape y="62" name="Wing R Shape">
+                    <Ellipse width="74" height="150" name="Path"/>
+                    <Fill name="Fill"><SolidColor colorValue="FF5E3A1B" name="Color"/></Fill>
+                </Shape>
+            </Node>
+
+            <Shape x="-38" y="146" name="Foot L">
+                <Ellipse width="44" height="18" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFF0A23A" name="Color"/></Fill>
+            </Shape>
+            <Shape x="38" y="146" name="Foot R">
+                <Ellipse width="44" height="18" name="Path"/>
+                <Fill name="Fill"><SolidColor colorValue="FFF0A23A" name="Color"/></Fill>
+            </Shape>
+        </Node>
+
+        <!-- Ground shadow: outside the owl so it stays put while he bobs. -->
+        <Shape x="200" y="424" opacity="0.35" name="Shadow">
+            <Ellipse width="210" height="24" name="Path"/>
+            <Fill name="Fill"><SolidColor colorValue="FF000000" name="Color"/></Fill>
+        </Shape>
+
+        <StateMachine name="Hoot" id="0:7">
+            <StateMachineLayer name="Idle" id="0:8">
+                <AnyState x="200" y="-120"/>
+                <ExitState x="400" y="-120"/>
+                <EntryState>
+                    <StateTransition stateToId="0:20"/>
+                </EntryState>
+                <AnimationState x="200" animationId="0:60" id="0:20"/>
+            </StateMachineLayer>
+            <StateMachineLayer name="Blink" id="0:9">
+                <AnyState x="200" y="-120"/>
+                <ExitState x="400" y="-120"/>
+                <EntryState>
+                    <StateTransition stateToId="0:21"/>
+                </EntryState>
+                <AnimationState x="200" animationId="0:61" id="0:21"/>
+            </StateMachineLayer>
+        </StateMachine>
+
+        <!-- Gentle bob, wing flaps and a swaying hat, four seconds a loop. -->
+        <LinearAnimation loopValue="loop" duration="240" name="Idle" id="0:60">
+            <KeyedObject objectId="0:10">
+                <KeyedProperty propertyKey="14">
+                    <KeyFrameDouble value="270" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="261" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="270" frame="240" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="0:17">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="0.25" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="0.42" frame="60" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="0.25" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="0.36" frame="180" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="0.25" frame="240" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="0:18">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="-0.25" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="-0.42" frame="60" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="-0.25" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="-0.36" frame="180" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="-0.25" frame="240" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                </KeyedProperty>
+            </KeyedObject>
+            <KeyedObject objectId="0:11">
+                <KeyedProperty propertyKey="15">
+                    <KeyFrameDouble value="-0.12" frame="0" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="-0.04" frame="120" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                    <KeyFrameDouble value="-0.12" frame="240" interpolationType="cubic"><CubicEaseInterpolator x1="0.42" y1="0" x2="0.58" y2="1"/></KeyFrameDouble>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+
+        <!-- A quick blink every five seconds. -->
+        <LinearAnimation loopValue="loop" duration="300" name="Blink" id="0:61">
+            <KeyedObject objectId="0:15">
+                <KeyedProperty propertyKey="17">
+                    <KeyFrameDouble value="1" frame="0" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="264" interpolationType="linear"/>
+                    <KeyFrameDouble value="0.08" frame="270" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="277" interpolationType="linear"/>
+                    <KeyFrameDouble value="1" frame="300" interpolationType="linear"/>
+                </KeyedProperty>
+            </KeyedObject>
+        </LinearAnimation>
+    </Artboard>
+
+    <ViewModel defaultInstanceId="0:44" name="Mascot" id="0:40">
+        <ViewModelPropertyNumber name="mouth" id="0:41"/>
+        <ViewModelPropertyNumber name="jaw" id="0:42"/>
+        <ViewModelPropertyNumber name="look" id="0:43"/>
+        <ViewModelInstance exports="true" name="Instance" id="0:44">
+            <ViewModelInstanceNumber propertyValue="0.05" viewModelPropertyId="0:41"/>
+            <ViewModelInstanceNumber propertyValue="30" viewModelPropertyId="0:42"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="0:43"/>
+        </ViewModelInstance>
+    </ViewModel>
+</Rive>

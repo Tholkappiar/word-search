@@ -37,6 +37,12 @@ export class GameAudio {
   private music?: Bus;
   private sfx?: Bus;
   private echo?: GainNode;
+  /** Sobo's voice: its own volume, a meter for lip sync, and a dip in the music while he talks. */
+  private voice?: Bus & { meter: AnalyserNode };
+  private duck?: GainNode;
+  private voiceClips = new Map<string, Promise<AudioBuffer | undefined>>();
+  private voiceSource?: AudioBufferSourceNode;
+  private meterData = new Float32Array(1024);
   private noise?: AudioBuffer;
   private previous?: GameState;
   private timer?: ReturnType<typeof setInterval>;
@@ -60,8 +66,13 @@ export class GameAudio {
     compressor.threshold.value = -18; compressor.ratio.value = 3; compressor.attack.value = 0.01; compressor.release.value = 0.25;
     compressor.connect(ctx.destination);
     const impulse = this.createImpulse(3.2);
-    this.music = this.createBus(impulse, 0.38, compressor);
+    this.duck = ctx.createGain(); this.duck.connect(compressor);
+    this.music = this.createBus(impulse, 0.38, this.duck);
     this.sfx = this.createBus(impulse, 0.28, compressor);
+    const voiceIn = ctx.createGain(), voiceVolume = ctx.createGain(), meter = ctx.createAnalyser();
+    voiceVolume.gain.value = 0; meter.fftSize = this.meterData.length;
+    voiceIn.connect(voiceVolume); voiceIn.connect(meter); voiceVolume.connect(compressor);
+    this.voice = { input: voiceIn, volume: voiceVolume, meter };
     this.noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     const samples = this.noise.getChannelData(0);
     for (let index = 0; index < samples.length; index++) samples[index] = Math.random() * 2 - 1;
@@ -94,11 +105,46 @@ export class GameAudio {
     const sfxLevel = (config.soundVolume / 100) ** 2;
     music.volume.gain.setTargetAtTime(musicLevel, ctx.currentTime, 0.4);
     sfx.volume.gain.setTargetAtTime(sfxLevel, ctx.currentTime, 0.05);
+    this.voice?.volume.gain.setTargetAtTime((config.voiceVolume / 100) ** 2 * 1.2, ctx.currentTime, 0.05);
     this.targetRoot = LEVEL_KEYS[(state.world.level - 1) % LEVEL_KEYS.length];
     const cues = detectCues(this.previous, state);
     this.previous = state;
     if (ctx.state !== "running" || paused) return;
     for (const cue of cues) this.play(cue);
+  }
+
+  /**
+   * Plays one of Sobo's voice clips, interrupting any line still playing, and dips the
+   * music under it. Resolves to the clip's length in seconds, or undefined when it
+   * cannot play (audio still blocked, or the clip is missing).
+   */
+  async speak(url: string): Promise<number | undefined> {
+    const ctx = this.ctx, voice = this.voice, duck = this.duck;
+    if (!ctx || !voice || !duck || ctx.state !== "running") return undefined;
+    if (!this.voiceClips.has(url)) {
+      this.voiceClips.set(url, fetch(url).then(response => response.ok ? response.arrayBuffer() : Promise.reject(new Error(url)))
+        .then(data => ctx.decodeAudioData(data)).catch(() => undefined));
+    }
+    const buffer = await this.voiceClips.get(url);
+    if (!buffer || this.ctx !== ctx) return undefined;
+    this.voiceSource?.stop();
+    const source = ctx.createBufferSource(), start = ctx.currentTime + 0.02;
+    source.buffer = buffer; source.connect(voice.input); source.start(start);
+    this.voiceSource = source;
+    duck.gain.cancelScheduledValues(start);
+    duck.gain.setTargetAtTime(0.45, start, 0.08);
+    duck.gain.setTargetAtTime(1, start + buffer.duration + 0.15, 0.4);
+    return buffer.duration;
+  }
+
+  /** How loud Sobo's voice is right now, 0..1, for his mouth. */
+  voiceLevel(): number {
+    const meter = this.voice?.meter;
+    if (!meter || this.ctx?.state !== "running") return 0;
+    meter.getFloatTimeDomainData(this.meterData);
+    let sum = 0;
+    for (const sample of this.meterData) sum += sample * sample;
+    return Math.min(1, Math.max(0, (Math.sqrt(sum / this.meterData.length) - 0.015) * 7));
   }
 
   /** Tries to start audio now; it works when called from a click or key press. */

@@ -32,7 +32,8 @@
         "finalLevel": 10,
         "stopGame": false,
         "musicVolume": 50,
-        "soundVolume": 70
+        "soundVolume": 70,
+        "voiceVolume": 80
       }
     }
   },
@@ -47,13 +48,16 @@
     "lint": "tsc -p tsconfig.json --noEmit",
     "dev": "bubbleportal dev",
     "dev:game": "vite",
-    "dev:container": "node scripts/runtime-start.mjs"
+    "dev:container": "node scripts/runtime-start.mjs",
+    "voice:generate": "node scripts/generate-voice.mjs",
+    "voice:lipsync": "node scripts/lipsync-voice.mjs"
   },
   "dependencies": {
     "@bubbleportal/sdk": "0.4.0",
-    "zod": "^3.25.67",
+    "@rive-app/canvas": "2.44.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@bubbleportal/devtools": "0.4.0",

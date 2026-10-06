@@ -17,8 +17,11 @@ const CONFETTI = ["#ffd23f", "#ff5d8f", "#3ee0cf", "#7ae582", "#a78bfa", "#ff9f1
 const PAGE = { x: 40, y: 440, width: 1000, height: 776 };
 const STAG_Y = 70, TITLE_Y = 186, TASK_Y = 292, TIP_Y = 376, NAME_Y = 250, FOUND_Y = 364;
 const STATUS_Y = 490, BAR_Y = 522, LEVEL_Y = 1292;
-/** Top of the end-of-round leaderboard, on the forest below the page. */
-const BOARD_Y = 1254, BOARD_ROWS = 5;
+/**
+ * End-of-round leaderboard on the forest below the page: shifted right and down to
+ * leave room for Sobo the host (bottom-left) and his speech bubble (above it).
+ */
+const BOARD_Y = 1338, BOARD_LEFT = 268, BOARD_WIDTH = 664, BOARD_ROWS = 5;
 /** Square area the tiles are centred in, and the hidden-word slots below it. */
 const GRID_TOP = 552, GRID_AREA = 480, SLOTS_Y = 1128;
 /** How far the painting is pushed down; the gap above is filled with its night-sky colour. */
@@ -492,7 +495,7 @@ function drawLeaderboard(ctx: Ctx, world: World): void {
   if (age <= 0) return;
   const thisRound = world.phase === "finished" ? new Map<string, number>() : roundPoints(world);
   const top = world.scores.slice(0, BOARD_ROWS);
-  const rowHeight = 56, rowGap = 6, header = 62, left = 120, width = 840;
+  const rowHeight = 48, rowGap = 5, header = 54, left = BOARD_LEFT, width = BOARD_WIDTH, center = left + width / 2;
   const height = header + Math.max(1, top.length) * (rowHeight + rowGap) + 14;
   const enter = easeOutCubic(clamp01(age / 420));
   ctx.save(); ctx.globalAlpha = enter; ctx.translate(0, (1 - enter) * 60);
@@ -503,13 +506,13 @@ function drawLeaderboard(ctx: Ctx, world: World): void {
   rounded(ctx, left, BOARD_Y, width, height, 28, glass, "rgba(243, 210, 124, 0.55)", 2);
   ctx.restore();
   const title = world.phase === "finished" ? "FINAL LEADERBOARD" : "LEADERBOARD";
-  text(ctx, title, 540, BOARD_Y + 36, 34, GOLD, LETTER_FONT);
+  text(ctx, title, center, BOARD_Y + 31, 30, GOLD, LETTER_FONT);
   const titleHalf = ctx.measureText(title).width / 2;
-  star(ctx, 540 - titleHalf - 30, BOARD_Y + 35, 10, GOLD); star(ctx, 540 + titleHalf + 30, BOARD_Y + 35, 10, GOLD);
+  star(ctx, center - titleHalf - 26, BOARD_Y + 30, 9, GOLD); star(ctx, center + titleHalf + 26, BOARD_Y + 30, 9, GOLD);
   ctx.strokeStyle = "rgba(243, 210, 124, 0.25)"; ctx.lineWidth = 2;
   ctx.beginPath(); ctx.moveTo(left + 30, BOARD_Y + header); ctx.lineTo(left + width - 30, BOARD_Y + header); ctx.stroke();
   if (!top.length) {
-    text(ctx, "No finds yet. Be the first next round!", 540, BOARD_Y + header + 36, 32, "#cfc3a2", FLAVOR_FONT);
+    text(ctx, "No finds yet. Be the first next round!", center, BOARD_Y + header + 32, 28, "#cfc3a2", FLAVOR_FONT);
     ctx.restore();
     return;
   }
@@ -518,38 +521,38 @@ function drawLeaderboard(ctx: Ctx, world: World): void {
     const rowAge = age - 200 - rank * 110;
     const slide = easeOutBack(clamp01(rowAge / 420));
     if (rowAge <= 0) return;
-    const y = BOARD_Y + header + 8 + rank * (rowHeight + rowGap), mid = y + rowHeight / 2;
+    const y = BOARD_Y + header + 7 + rank * (rowHeight + rowGap), mid = y + rowHeight / 2;
     ctx.save(); ctx.globalAlpha = enter * clamp01(rowAge / 200); ctx.translate((1 - slide) * 80, 0);
     // Row background with a soft bar showing the share of the leader's points.
-    rounded(ctx, left + 20, y, width - 40, rowHeight, 16, rank === 0 ? "rgba(255, 210, 63, 0.14)" : "rgba(255, 255, 255, 0.05)");
-    const bar = ctx.createLinearGradient(left + 20, 0, left + width - 20, 0);
+    rounded(ctx, left + 16, y, width - 32, rowHeight, 14, rank === 0 ? "rgba(255, 210, 63, 0.14)" : "rgba(255, 255, 255, 0.05)");
+    const bar = ctx.createLinearGradient(left + 16, 0, left + width - 16, 0);
     bar.addColorStop(0, "rgba(243, 210, 124, 0.22)"); bar.addColorStop(1, "rgba(243, 210, 124, 0.04)");
-    rounded(ctx, left + 20, y, Math.max(rowHeight, (width - 40) * entry.points / best), rowHeight, 16, bar);
+    rounded(ctx, left + 16, y, Math.max(rowHeight, (width - 32) * entry.points / best), rowHeight, 14, bar);
     // Medal or rank number.
-    const medalX = left + 62;
+    const medalX = left + 50;
     if (rank < MEDALS.length) {
-      const medal = ctx.createLinearGradient(0, mid - 20, 0, mid + 20);
+      const medal = ctx.createLinearGradient(0, mid - 18, 0, mid + 18);
       medal.addColorStop(0, MEDALS[rank][0]); medal.addColorStop(1, MEDALS[rank][1]);
-      ctx.beginPath(); ctx.arc(medalX, mid, 21, 0, Math.PI * 2); ctx.fillStyle = medal; ctx.fill();
+      ctx.beginPath(); ctx.arc(medalX, mid, 18, 0, Math.PI * 2); ctx.fillStyle = medal; ctx.fill();
       ctx.strokeStyle = "rgba(255, 255, 255, 0.6)"; ctx.lineWidth = 2; ctx.stroke();
-      text(ctx, String(rank + 1), medalX, mid + 2, 26, INK, LETTER_FONT);
+      text(ctx, String(rank + 1), medalX, mid + 2, 23, INK, LETTER_FONT);
     } else {
-      ctx.beginPath(); ctx.arc(medalX, mid, 19, 0, Math.PI * 2); ctx.strokeStyle = "rgba(232, 214, 168, 0.45)"; ctx.lineWidth = 2; ctx.stroke();
-      text(ctx, String(rank + 1), medalX, mid + 2, 24, "#e8d6a8", LETTER_FONT);
+      ctx.beginPath(); ctx.arc(medalX, mid, 16, 0, Math.PI * 2); ctx.strokeStyle = "rgba(232, 214, 168, 0.45)"; ctx.lineWidth = 2; ctx.stroke();
+      text(ctx, String(rank + 1), medalX, mid + 2, 21, "#e8d6a8", LETTER_FONT);
     }
-    text(ctx, shorten(entry.name, 16), medalX + 44, mid + 2, rank === 0 ? 38 : 34, rank === 0 ? "#fff1c4" : "#efe2c0", LETTER_FONT, "left");
+    text(ctx, shorten(entry.name, 13), medalX + 36, mid + 2, rank === 0 ? 33 : 30, rank === 0 ? "#fff1c4" : "#efe2c0", LETTER_FONT, "left");
     // Points on the right, with this round's gain in a green pill.
-    const right = left + width - 46;
-    text(ctx, "pts", right, mid + 4, 24, "rgba(232, 214, 168, 0.65)", FLAVOR_FONT, "right");
+    const right = left + width - 38;
+    text(ctx, "pts", right, mid + 4, 22, "rgba(232, 214, 168, 0.65)", FLAVOR_FONT, "right");
     const pts = ctx.measureText("pts").width;
-    text(ctx, String(entry.points), right - pts - 10, mid + 2, 38, GOLD, LETTER_FONT, "right");
+    text(ctx, String(entry.points), right - pts - 8, mid + 2, 33, GOLD, LETTER_FONT, "right");
     const gained = thisRound.get(entry.name);
     if (gained) {
       const number = ctx.measureText(String(entry.points)).width, label = `+${gained}`;
-      ctx.font = `400 26px ${LETTER_FONT}`;
-      const pill = ctx.measureText(label).width + 24, pillRight = right - pts - 10 - number - 14;
-      rounded(ctx, pillRight - pill, mid - 17, pill, 34, 17, "rgba(34, 197, 94, 0.22)", "rgba(74, 222, 128, 0.7)", 1.5);
-      text(ctx, label, pillRight - pill / 2, mid + 2, 26, "#86efac", LETTER_FONT);
+      ctx.font = `400 23px ${LETTER_FONT}`;
+      const pill = ctx.measureText(label).width + 20, pillRight = right - pts - 8 - number - 12;
+      rounded(ctx, pillRight - pill, mid - 15, pill, 30, 15, "rgba(34, 197, 94, 0.22)", "rgba(74, 222, 128, 0.7)", 1.5);
+      text(ctx, label, pillRight - pill / 2, mid + 2, 23, "#86efac", LETTER_FONT);
     }
     ctx.restore();
   });

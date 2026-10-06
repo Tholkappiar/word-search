@@ -5,3 +5,5 @@ coverage
 .gameinstance/
 artifacts/
 .DS_Store
+.env.local
+tools/

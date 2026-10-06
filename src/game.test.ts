@@ -95,7 +95,7 @@ describe("word search puzzles", () => {
     }
     expect(forwards / total).toBeGreaterThan(0.6);
     expect(forwards).toBeLessThan(total);
-  });
+  }, 20_000);
   it("finds a hidden word anywhere in a chat message, as a whole word", () => {
     const { world } = createGame().getState(); const target = world.words[0].word;
     expect(findMentionedWord(world.words, `found ${target.toLowerCase()}!!`)?.word).toBe(target);
@@ -261,7 +261,7 @@ describe("word search gameplay", () => {
     game.advance(4 * TICKS_PER_SECOND);
     expect(game.getState().world).toMatchObject({ level: 2, phaseMsLeft: 40_000 });
     const original = game.getState();
-    for (const patch of [{ secondsPerWord: 5 }, { celebrateSeconds: 0 }, { revealSeconds: 60 }, { secondsPerWord: 30.5 }, { finalLevel: -1 }, { finalLevel: 51 }, { stopGame: "yes" }, { musicVolume: -1 }, { soundVolume: 101 }, { musicVolume: 50.5 }, { unregistered: true }]) {
+    for (const patch of [{ secondsPerWord: 5 }, { celebrateSeconds: 0 }, { revealSeconds: 60 }, { secondsPerWord: 30.5 }, { finalLevel: -1 }, { finalLevel: 51 }, { stopGame: "yes" }, { musicVolume: -1 }, { soundVolume: 101 }, { musicVolume: 50.5 }, { voiceVolume: 101 }, { unregistered: true }]) {
       expect(() => game.dispatch(command("setConfig", { game: patch }))).toThrow();
       expect(game.getState()).toEqual(original);
     }

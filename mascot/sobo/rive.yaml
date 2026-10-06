@@ -1,0 +1,8 @@
+name: sobo
+logs:
+  file: build/rive.log
+  problems: build/problems.log
+main: "SOBO-Motion-V02"
+push:
+  projectId: 2013519
+  fileId: 2634484

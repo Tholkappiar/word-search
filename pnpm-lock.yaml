@@ -11,6 +11,9 @@ importers:
       '@bubbleportal/sdk':
         specifier: 0.4.0
         version: 0.4.0(react@19.3.0)
+      '@rive-app/canvas':
+        specifier: 2.44.0
+        version: 2.44.0
       react:
         specifier: ^19.1.0
         version: 19.3.0
@@ -326,6 +329,9 @@ packages:
     engines: {node: ^22.20 || ^24.12 || >=25}
     cpu: [x64]
     os: [linux]
+
+  '@rive-app/canvas@2.44.0':
+    resolution: {integrity: sha512-ak0GGwCbuWubi6rP9qB5YPy5CxYuTY3AiuTV4i1Vi7GXhuK2XB+M+4WJMuGcYGfGLzojaVMKaxtunD5OjjGzOQ==}
 
   '@rolldown/pluginutils@1.0.0-beta.27':
     resolution: {integrity: sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==}
@@ -1076,6 +1082,8 @@ snapshots:
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
+
+  '@rive-app/canvas@2.44.0': {}
 
   '@rolldown/pluginutils@1.0.0-beta.27': {}
 
