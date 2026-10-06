@@ -137,6 +137,9 @@ export class GameAudio {
     return buffer.duration;
   }
 
+  /** Whether the browser is letting the game play sound yet (it waits for a first click or key). */
+  get running(): boolean { return this.ctx?.state === "running"; }
+
   /** How loud Sobo's voice is right now, 0..1, for his mouth. */
   voiceLevel(): number {
     const meter = this.voice?.meter;

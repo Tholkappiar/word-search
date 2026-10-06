@@ -74,7 +74,7 @@ for (const line of lines) {
 }
 console.log(`Done: ${made} generated (${characters} characters), ${skipped} already existed.`);
 // Mouth shapes for the new clips (skipped with a hint if Rhubarb is not installed).
-try { execFileSync(process.execPath, [resolve(root, "scripts/lipsync-voice.mjs"), ...(force ? ["--force"] : [])], { stdio: "inherit" }); }
+try { execFileSync(process.execPath, [resolve(root, "scripts/lipsync-voice.mjs"), ...(only ? [`--only=${only}`] : force ? ["--force"] : [])], { stdio: "inherit" }); }
 catch { console.error("Lip sync did not finish; run corepack pnpm voice:lipsync once Rhubarb is set up."); }
 
 function readEnvFile(path) {

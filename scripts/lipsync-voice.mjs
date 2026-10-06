@@ -4,6 +4,7 @@
 //
 //   corepack pnpm voice:lipsync           clips without mouth timings yet
 //   corepack pnpm voice:lipsync --force   redo every clip
+//   corepack pnpm voice:lipsync --only=id redo one clip
 //
 // Needs Rhubarb (https://github.com/DanielSWolf/rhubarb-lip-sync/releases): on PATH, in
 // RHUBARB, or unzipped into tools/. Uses macOS afconvert (or ffmpeg) to read the mp3s.
@@ -25,8 +26,9 @@ if (!rhubarb) {
 }
 const lines = Object.fromEntries(Object.values(JSON.parse(readFileSync(resolve(root, "src/voice-lines.json"), "utf8"))).flat().map(line => [line.id, line.say]));
 const force = process.argv.includes("--force");
+const only = process.argv.find(arg => arg.startsWith("--only="))?.slice(7);
 const clips = existsSync(voiceDir) ? readdirSync(voiceDir).filter(file => file.endsWith(".mp3")).map(file => file.slice(0, -4)) : [];
-const todo = clips.filter(id => force || !existsSync(join(voiceDir, `${id}.json`)));
+const todo = clips.filter(id => only ? id === only : force || !existsSync(join(voiceDir, `${id}.json`)));
 if (!clips.length) { console.log("No voice clips yet. Run corepack pnpm voice:generate first."); process.exit(0); }
 console.log(`Lip sync: ${todo.length} of ${clips.length} clips (Rhubarb takes a few seconds each)…`);
 const work = mkdtempSync(join(tmpdir(), "lipsync-"));

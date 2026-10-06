@@ -28,9 +28,15 @@ export class Host {
     const champion = state.world.scores[0];
     for (const cue of cues) {
       if (cue.kind === "gameOver") {
-        options.push(this.line(state.runtime.config.stopGame ? "stopped" : "gameOver", PRIORITY.gameOver, champion ? { name: champion.name, points: champion.points } : {}));
+        // "You were all amazing" only fits when more than one person played.
+        const groups = state.runtime.config.stopGame ? ["stopped"] : state.world.scores.length >= 2 ? ["gameOver", "gameOverTeam"] : ["gameOver"];
+        options.push(this.line(groups, PRIORITY.gameOver, champion ? { name: champion.name, points: champion.points } : {}));
       }
-      if (cue.kind === "levelClear") options.push(this.line("clear", PRIORITY.roundEnd));
+      if (cue.kind === "levelClear") {
+        // Teamwork lines only when two or more people found words this round; a solo clear gets its own praise.
+        const finders = [...new Set(state.world.words.filter(word => word.foundBy).map(word => word.foundBy))];
+        options.push(this.line(finders.length >= 2 ? ["clear", "clearTeam"] : ["clear", "clearSolo"], PRIORITY.roundEnd, { name: finders[0] ?? "" }));
+      }
       if (cue.kind === "timeUp") options.push(this.line("timeUp", PRIORITY.roundEnd));
       if (cue.kind === "levelStart") {
         const group = cue.retry ? "retry" : cue.level === 1 && state.world.scores.length === 0 ? "welcome" : GROUPS[`level_${cue.level}`] ? `level_${cue.level}` : "level_more";
@@ -57,12 +63,14 @@ export class Host {
     return priority > PRIORITY.praise || msSinceLastLine >= CHATTER_GAP_MS;
   }
 
-  private line(group: string, priority: number, values: Record<string, string | number> = {}): Speech {
-    const lines = GROUPS[group];
-    // Never the same line twice in a row from one group.
-    const choices = lines.length > 1 ? lines.filter(line => line.id !== this.lastIds.get(group)) : lines;
+  /** A random line from one group, or from several groups pooled together. */
+  private line(group: string | string[], priority: number, values: Record<string, string | number> = {}): Speech {
+    const groups = typeof group === "string" ? [group] : group, key = groups.join("+");
+    const lines = groups.flatMap(name => GROUPS[name]);
+    // Never the same line twice in a row from one pool.
+    const choices = lines.length > 1 ? lines.filter(line => line.id !== this.lastIds.get(key)) : lines;
     const line = choices[Math.floor(this.random() * choices.length)];
-    this.lastIds.set(group, line.id);
+    this.lastIds.set(key, line.id);
     return { id: line.id, text: fill(line, values), priority };
   }
 }

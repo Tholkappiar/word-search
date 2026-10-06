@@ -54,8 +54,13 @@
   ],
   "clear": [
     { "id": "clear_1", "say": "[excited] That's all of them! Level complete!" },
-    { "id": "clear_2", "say": "[happy] Every single word! What a team!" },
     { "id": "clear_3", "say": "[giggles] Level cleared! I'm so proud I could sprout!" }
+  ],
+  "clearTeam": [
+    { "id": "clear_2", "say": "[happy] Every single word! What a team!" }
+  ],
+  "clearSolo": [
+    { "id": "clearsolo_1", "say": "[impressed] Wow, a solo run! You found every single word!", "show": "Wow, {name} found every word solo!" }
   ],
   "timeUp": [
     { "id": "timeup_1", "say": "[sad] Aww, time's up! The missed words are in red." },
@@ -71,7 +76,9 @@
     { "id": "idle_6", "say": "[cheerfully] Just type what you see, friends!" }
   ],
   "gameOver": [
-    { "id": "gameover_1", "say": "[excited] And that's the game! Congratulations to our champion!", "show": "That's the game! Champion: {name} with {points} pts!" },
+    { "id": "gameover_1", "say": "[excited] And that's the game! Congratulations to our champion!", "show": "That's the game! Champion: {name} with {points} pts!" }
+  ],
+  "gameOverTeam": [
     { "id": "gameover_2", "say": "[happy] Game complete! [laughs] You were all amazing!", "show": "Game complete! Champion: {name} with {points} pts!" }
   ],
   "stopped": [

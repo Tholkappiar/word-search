@@ -110,8 +110,14 @@ describe("enchanted forest rendering", () => {
     const total = game.getState().world.words.length * levelSpec(1).points;
     const texts = draw(game.getState());
     const gridTop = Math.min(...tileLetters(texts).map(entry => entry.y));
-    const result = texts.filter(entry => ["Level 1 Complete!", `Top finder: Solver  +${total}`, "Level 2 starts in 4s"].includes(entry.value));
-    expect(result).toHaveLength(3);
+    const result = texts.filter(entry => ["Level 1 Complete!", "Solo clear by Solver!", `Top finder: Solver  +${total}`, "Level 2 starts in 4s"].includes(entry.value));
+    expect(result).toHaveLength(4);
+    expect(values(texts)).not.toContain("Great teamwork, chat!");
+    // Two finders in one round: that is teamwork.
+    game.advance(6 * 60);
+    const [first, second] = game.getState().world.words;
+    game.dispatch(chat(first.word, "Ava")); game.dispatch(chat(second.word, "Ben")); game.advance(150);
+    expect(values(draw(game.getState()))).toEqual(expect.arrayContaining(["Level 2 Complete!", "Great teamwork, chat!"]));
     for (const entry of result) expect(entry.y).toBeLessThan(gridTop);
   });
   it("shows a top-5 leaderboard below the board at the end of each round, with this round's gains", () => {

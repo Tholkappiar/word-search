@@ -470,7 +470,8 @@ function drawRoundEnd(ctx: Ctx, world: World, config: GameConfig): void {
   } else if (complete) {
     const final = isFinalLevel(world.level, config);
     text(ctx, final ? "Final Level Complete!" : `Level ${world.level} Complete!`, 0, -118, final ? 60 : 66, INK, TITLE_FONT);
-    text(ctx, "Great teamwork, chat!", 0, -46, 40, SEPIA, FLAVOR_FONT);
+    // Teamwork only when two or more people found words this round.
+    text(ctx, roundPoints(world).size >= 2 ? "Great teamwork, chat!" : `Solo clear by ${shorten(mvp, 16)}!`, 0, -46, 40, SEPIA, FLAVOR_FONT);
     if (mvp) text(ctx, `Top finder: ${shorten(mvp, 14)}  +${mvpPoints}`, 0, 22, 38, INK, LETTER_FONT);
     text(ctx, final ? `Final results in ${seconds}s` : `Level ${world.level + 1} starts in ${seconds}s`, 0, mvp ? 98 : 60, 40, "#0f7a55", LETTER_FONT);
   } else {

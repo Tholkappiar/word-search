@@ -35,6 +35,8 @@ const GESTURE_FOR: [RegExp, number][] = [
 /** Speech bubble above the leaderboard / level badge, its tail pointing down at Sobo. */
 const BUBBLE = { left: 230, maxRight: 934, centerY: 1282, minWidth: 540, minHeight: 92 };
 const IDLE_AFTER_MS = 25_000, IDLE_REPEAT_MS = 22_000, HOLD_MS = 1600, FADE_MS = 300;
+/** How long a voiced line waits for the browser to allow sound before it is shown silently. */
+const SOUND_WAIT_MS = 10_000;
 
 /** A line being said: its mouth track (none while following a clip's loudness instead). */
 type Talk = Speech & { startedAt: number; durationMs: number; voiced: boolean; track?: LipSyncTrack };
@@ -54,6 +56,8 @@ export class Mascot {
   private previous?: GameState;
   private talk?: Talk;
   private queued?: Speech;
+  /** A voiced line held until the browser allows sound (it plays once the page is clicked). */
+  private waiting?: Speech & { since: number };
   private lastLineEndedAt = 0;
   private lastActivityAt = performance.now();
   private mouthPose: number = VISEME.rest;
@@ -107,13 +111,25 @@ export class Mascot {
 
   private offer(speech: Speech, now: number): void {
     const talk = this.talk;
-    if (!talk) { if (Host.mayChatter(speech.priority, now - this.lastLineEndedAt)) this.say(speech, now); return; }
+    // While a line waits for sound, say() keeps the most important one in its spot.
+    if (!talk) { if (this.waiting || Host.mayChatter(speech.priority, now - this.lastLineEndedAt)) this.say(speech, now); return; }
     // A bigger moment cuts in; anything else worth saying waits its turn.
     if (speech.priority > talk.priority) this.say(speech, now);
     else if (speech.priority >= 3 && (!this.queued || speech.priority >= this.queued.priority)) this.queued = speech;
   }
 
   private say(speech: Speech, now: number): void {
+    // Browsers hold sound until the first click: keep a voiced line until then rather than
+    // miming it silently (the welcome would otherwise be lost before anyone hears it).
+    if (this.waiting) { if (speech.priority >= this.waiting.priority) this.waiting = { ...speech, since: this.waiting.since }; return; }
+    if (this.audio && !this.audio.running && CLIPS[`./assets/voice/${speech.id}.mp3`]) {
+      this.waiting = { ...speech, since: now };
+      return;
+    }
+    this.sayNow(speech, now);
+  }
+
+  private sayNow(speech: Speech, now: number): void {
     // Until a clip plays, mouth the bubble's letters at a natural pace.
     const track = textTrack(speech.text);
     const talk: Talk = { ...speech, startedAt: now, durationMs: track.duration * 1000 + 200, voiced: false, track };
@@ -131,6 +147,13 @@ export class Mascot {
 
   /** Drives the mouth and the line queue every frame. */
   private animate(now: number): void {
+    const waiting = this.waiting;
+    if (waiting && (this.audio?.running || now - waiting.since > SOUND_WAIT_MS)) {
+      // Sound is allowed now, or it is not coming: say the line (silently if still blocked).
+      this.waiting = undefined;
+      this.talk = undefined;
+      this.sayNow(waiting, now);
+    }
     const talk = this.talk;
     if (talk && now - talk.startedAt > talk.durationMs + HOLD_MS + FADE_MS) {
       this.talk = undefined; this.lastLineEndedAt = now; this.setGesture(GESTURE.idle);
