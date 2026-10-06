@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { NormalizedChatEventSchema } from "@repo/protocol";
-import { applySharedGameCommand, createInitialSharedGameState, parseRuntimeControlCommand } from "@repo/game-kit";
-import { defineGame, createGameEngine, createSharedGameStateSchema, type GameEngineOptions, type SimulationContext } from "@repo/game-kit/engine";
+import { NormalizedChatEventSchema } from "@bubbleportal/sdk";
+import { applySharedGameCommand, createInitialSharedGameState, parseRuntimeControlCommand } from "@bubbleportal/sdk";
+import { defineGame, createGameEngine, createSharedGameStateSchema, type GameEngineOptions, type SimulationContext } from "@bubbleportal/sdk/engine";
 import { THEMES } from "./themes";
 
 // Word Search: a themed letter grid hides words placed in any of eight directions,

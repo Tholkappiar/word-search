@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { canonicalGameStateHash, runGameScenario, type GameScenario } from "@repo/game-kit/engine";
+import { canonicalGameStateHash, runGameScenario, type GameScenario } from "@bubbleportal/sdk/engine";
 import { gameDefinition } from "./game";
 
 type Scenario = GameScenario<ReturnType<typeof gameDefinition.createInitialState>, typeof gameDefinition.initialConfig, Parameters<typeof gameDefinition.applyCommand>[1]>;
@@ -19,7 +19,7 @@ function parseFixture(raw: unknown): { scenario: Scenario; allowRevisionMismatch
     allowRevisionMismatch = raw.allowRevisionMismatch === true;
   }
   if (!isObject(scenario) || !Array.isArray(scenario.assertions) || scenario.assertions.length === 0) {
-    throw new Error("Regression fixture needs at least one assertion. Use Capture regression or gameinstance-dev scenario record.");
+    throw new Error("Regression fixture needs at least one assertion. Use Capture regression or bubbleportal scenario record.");
   }
   // The engine validates the full capture, game/schema identity and revision.
   return { scenario: scenario as Scenario, allowRevisionMismatch };

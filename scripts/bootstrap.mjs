@@ -1,33 +1,34 @@
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
 import { spawnSync } from "node:child_process";
-import { verifySdk } from "./verify-sdk.mjs";
-
+import { existsSync, mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, resolve, join } from "node:path";
+import { createRequire } from "node:module";
+import { pathToFileURL } from "node:url";
 const root = process.cwd();
-const sdk = resolve(root, "vendor/gameinstance");
-const doctor = process.argv.includes("--check");
-function fail(message) { console.error(message); process.exit(1); }
-function run(binary, args) {
-  const result = spawnSync(binary, args, { cwd: root, stdio: "inherit", shell: process.platform === "win32" });
-  if (result.status !== 0) fail(binary + " failed. Check the output above; no mutable install fallback was used.");
+if (Number(process.versions.node.split(".")[0]) < 22) throw new Error("Install Node 22 or newer.");
+const env = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => value !== undefined && ["PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "COMSPEC", "HOME", "USER", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP", "TMPDIR", "TERM", "COLORTERM", "FORCE_COLOR", "CI", "COREPACK_HOME", "NODE_ENV"].includes(key.toUpperCase())));
+if (existsSync(resolve(root, ".npmrc"))) throw new Error("Review project .npmrc manually; the public SDK bootstrap does not consume registry credentials.");
+if (process.argv.includes("--check")) {
+  const require = createRequire(resolve(root, "package.json"));
+  const { doctorProject } = await import(pathToFileURL(require.resolve("@bubbleportal/devtools/projects")).href);
+  const report = await doctorProject(root); console.log(JSON.stringify(report, null, 2));
+  if (!report.ok || report.diagnostics.some(item => item.code === "dependencies_missing")) process.exitCode = 1;
+} else {
+  let command = "corepack", args = ["pnpm", "install", "--frozen-lockfile", "--ignore-scripts", "--ignore-pnpmfile", "--registry=https://registry.npmjs.org"];
+  if (process.platform === "win32") {
+    const candidates = [dirname(process.execPath), ...(process.env.PATH || "").split(";")].map(base => resolve(base, "node_modules/corepack/dist/corepack.js"));
+    const cli = candidates.find(file => existsSync(file));
+    if (!cli) throw new Error("Corepack's Node entrypoint is missing; install Corepack for Node 22.");
+    command = process.execPath; args = [cli, ...args];
+  }
+  const configDirectory = mkdtempSync(join(tmpdir(), "bubbleportal-bootstrap-")), config = join(configDirectory, "empty-npmrc");
+  writeFileSync(config, "", { flag: "wx", mode: 0o600 });
+  let result;
+  try { result = spawnSync(command, args, { cwd: root, env: { ...env, npm_config_userconfig: config, npm_config_globalconfig: config, npm_config_registry: "https://registry.npmjs.org", COREPACK_ENABLE_DOWNLOAD_PROMPT: "0" }, stdio: "inherit", shell: false, windowsHide: true }); }
+  finally { rmSync(configDirectory, { recursive: true, force: true }); }
+  if (result.error || result.status !== 0) throw new Error("Frozen dependency installation failed; no mutable fallback was used.");
+  const require = createRequire(resolve(root, "package.json"));
+  const { doctorProject } = await import(pathToFileURL(require.resolve("@bubbleportal/devtools/projects")).href);
+  const report = await doctorProject(root); if (!report.ok || report.diagnostics.some(item => item.code === "dependencies_missing")) throw new Error("Installed SDK validation failed. Run bubbleportal doctor.");
+  console.log("Ready. Run corepack pnpm dev, test, lint or build.");
 }
-if (Number(process.versions.node.split(".")[0]) < 22) fail("Install Node 22 or newer.");
-let sdkInfo;
-try { sdkInfo = verifySdk(root); }
-catch (error) { fail(error.message); }
-const pnpm = spawnSync("corepack", ["pnpm", "--version"], { cwd: root, encoding: "utf8", shell: process.platform === "win32" });
-if (pnpm.status !== 0 || pnpm.stdout.trim() !== "10.12.1") fail("Install/activate pnpm 10.12.1 with corepack prepare pnpm@10.12.1 --activate.");
-if (doctor) {
-  const built = ["protocol/dist/index.js", "game-kit/dist/engine.js", "game-dev/dist/cli.js"].every(path => existsSync(resolve(sdk, "packages", path)));
-  console.log("Node " + process.versions.node + "; pnpm 10.12.1; verified SDK " + sdkInfo.sdkVersion + " (" + sdkInfo.sdkIdentity + ")");
-  if (!existsSync(resolve(root, "node_modules")) || !built) fail("SDK source is valid, but dependencies/builds are missing. Run corepack pnpm bootstrap.");
-  console.log("Dependencies and SDK builds are present. Run corepack pnpm dev.");
-  process.exit(0);
-}
-run("corepack", ["pnpm", "install", "--frozen-lockfile"]);
-run("corepack", ["pnpm", "--filter", "@repo/protocol", "build"]);
-run("corepack", ["pnpm", "--filter", "@repo/game-kit", "build"]);
-run("corepack", ["pnpm", "--filter", "@repo/game-dev", "build"]);
-// Workspace binaries are linked only after the cold-built CLI exists.
-run("corepack", ["pnpm", "install", "--frozen-lockfile"]);
-console.log("Ready. Run corepack pnpm dev, test, lint or build.");

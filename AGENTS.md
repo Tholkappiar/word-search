@@ -11,7 +11,7 @@ pnpm dev. Checks: corepack pnpm test, corepack pnpm lint, corepack pnpm build.
 Preserve gameInstance.gameContractVersion, package dependencies, frozen lockfile,
 build/dev:container scripts, src/main.tsx, /healthz, __STREAM_READY__ lifecycle,
 SAMPLE_GAME_PORT and VITE_CONTROL_WS_URL integration. Keep developer-only tooling
-out of the production browser. Do not edit vendor packages or expose credentials.
+out of the production browser. Do not edit installed packages or expose credentials.
 
 Keep createRuntimeCommandClient and the existing command/result plumbing.
 Chat/paid input is injectChatEvent payload.chatEvent; subscribers are
@@ -32,7 +32,7 @@ events; synthetic events alone do not prove live polling.
 ## Extending this starter
 
 Keep gameplay logic/state in src/game.ts and snapshot drawing in src/render.ts.
-This starter uses the bundled engine: register its state in a JSON-safe schema
+This starter uses the installed SDK engine: register its state in a JSON-safe schema
 and initializer, use context.random()/the engine clock for gameplay, and return
 external work as effects. Do not move authoritative state into render callbacks.
 Preserve the existing integration rather than rebuilding it for routine changes.
@@ -51,3 +51,7 @@ integration a prerequisite for completing ordinary game work. When the user asks
 to add or configure them, use the [game-testing skill](.agents/skills/game-testing/SKILL.md).
 Keep any existing working tooling/tests intact; do not force a redesign merely
 to add testing features. Report checks not run and remaining compatibility limits.
+
+Keep SDK dependencies pinned to exact versions and preserve .gamego/sdk.json and
+the frozen lockfile. For an explicitly requested SDK upgrade or bundled-to-npm
+migration, use the [sdk-upgrade skill](.agents/skills/sdk-upgrade/SKILL.md).

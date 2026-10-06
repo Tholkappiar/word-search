@@ -1,12 +1,15 @@
 import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+const root = process.cwd(), require = createRequire(resolve(root, "package.json"));
 const port = Number(process.env.SAMPLE_GAME_PORT || "5173");
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("Invalid SAMPLE_GAME_PORT");
-const env = { ...process.env, VITE_GAMEINSTANCE_DEV_ENABLED: "false" };
-function run(binary, args) {
-  const result = spawnSync(binary, args, { cwd: process.cwd(), stdio: "inherit", env, shell: process.platform === "win32" });
-  if (result.status !== 0) process.exit(result.status || 1);
-}
-// Verify the committed bundle, then compile before Vite resolves package exports.
-run("node", ["scripts/verify-sdk.mjs"]);
-for (const name of ["@repo/protocol", "@repo/game-kit", "@repo/game-dev"]) run("corepack", ["pnpm", "--filter", name, "build"]);
-run("corepack", ["pnpm", "exec", "vite", "--host", "0.0.0.0", "--port", String(port), "--strictPort"]);
+const { doctorProject } = await import(pathToFileURL(require.resolve("@bubbleportal/devtools/projects")).href);
+const report = await doctorProject(root);
+if (!report.ok || report.diagnostics.some(item => item.code === "dependencies_missing")) throw new Error("Verified prebuilt SDK dependencies are required. Run corepack pnpm bootstrap before starting the runtime.");
+const env = Object.fromEntries(Object.entries(process.env).filter(([key, value]) => value !== undefined && (["PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "COMSPEC", "HOME", "USER", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "TEMP", "TMP", "TMPDIR", "TERM", "COLORTERM", "FORCE_COLOR", "CI", "NODE_ENV"].includes(key.toUpperCase()) || ["VITE_CONTROL_WS_URL", "VITE_STARTING_CONFIG_JSON"].includes(key))));
+env.VITE_GAMEINSTANCE_DEV_ENABLED = "false";
+const vite = resolve(require.resolve("vite/package.json"), "../bin/vite.js");
+const child = spawnSync(process.execPath, [vite, "--host", "0.0.0.0", "--port", String(port), "--strictPort"], { cwd: root, env, stdio: "inherit", shell: false, windowsHide: true });
+if (child.error) throw new Error("Game runtime could not start"); process.exitCode = child.status ?? 1;

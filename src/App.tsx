@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { createRuntimeCommandClient, type RuntimeCommandClient } from "@repo/game-kit/browser";
-import { buildRejectedCommandResult } from "@repo/game-kit";
-import { engineDevAdapter, registerGameDev } from "@repo/game-dev/browser";
+import { createRuntimeCommandClient, type RuntimeCommandClient } from "@bubbleportal/sdk/browser";
+import { buildRejectedCommandResult } from "@bubbleportal/sdk";
+import { engineDevAdapter, registerGameDev } from "@bubbleportal/devtools/browser";
 import { createGame, gameDefinition } from "./game";
 import { renderGame } from "./render";
 import "./styles.css";

@@ -22,13 +22,13 @@ Preserve the game design and basic runtime contract. An investigation is read-on
    gameplay pause from debugger freeze and current config from staged starting config.
    Check queued input's terminal apply/reject/discard results, not only receipt.
 4. Run corepack pnpm dev. Inspect the variable panel or run corepack pnpm exec
-   gameinstance-dev status and corepack pnpm exec gameinstance-dev state. Use
+   bubbleportal status and corepack pnpm exec bubbleportal state. Use
    --help for input, patch and history operations.
    Reproduce with a fixed seed; freeze, edit a bounded field, seek and replay, then
    compare original/edited outcomes. Verify replay reproduces the expected gameplay,
    RNG and clock state, and that external effects do not repeat during replay.
 5. If saved regression scenarios are requested or useful for the chosen testing
-   work, capture a known-correct regression with corepack pnpm exec gameinstance-dev
+   work, capture a known-correct regression with corepack pnpm exec bubbleportal
    scenario record scenarios/<name>.scenario.json, or inspector Capture regression.
    Review expected state and run corepack pnpm test:scenarios. Each fixture needs
    meaningful assertions. Follow [scenario guidance](../../../scenarios/README.md)
@@ -38,4 +38,4 @@ Preserve the game design and basic runtime contract. An investigation is read-on
    frozen input completion, rewind range and branch behavior. If startup/transport
    changed, rerun local runtime compatibility checks too. Report exactly what was
    verified and any unsupported capabilities; synthetic inputs do not prove provider
-   ingestion. Keep session credentials private and vendor SDK source unchanged.
+   ingestion. Keep session credentials private and installed SDK packages unchanged.

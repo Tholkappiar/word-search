@@ -2,8 +2,8 @@
 
 An empty 2D canvas, ready for your own game.
 
-This folder is ready for local game development. The GameInstance SDK is bundled
-in vendor/gameinstance. No account, stream, database or provider credentials are
+This folder is ready for local game development. The BubblePortal SDK and developer tools are installed
+from exact-version npm packages. .gamego/sdk.json records their release identity. No account, stream, database or provider credentials are
 needed to make and test the game.
 
 ## Run locally
@@ -14,8 +14,7 @@ Open the extracted game folder in your editor. Use Node 22+ and pnpm 10.12.1:
     corepack pnpm bootstrap
     corepack pnpm dev
 
-Bootstrap verifies the bundled SDK, performs a frozen install and builds its
-packages. The local launcher prints the game URL. To choose a fixed port, use
+Bootstrap performs a frozen dependency install and checks the prebuilt packages. The local launcher prints the game URL. To choose a fixed port, use
 corepack pnpm dev --game-port 5173. Use corepack pnpm run doctor for prerequisite
 checks. These commands work on Windows and Unix.
 
@@ -66,3 +65,11 @@ platform-compatible game. After building your game, ask to use the
 [game-testing skill](.agents/skills/game-testing/SKILL.md) to integrate or configure
 those tools for its variables and behavior. Leave the existing plumbing intact;
 there is no need to configure every advanced feature before making the game.
+
+## SDK dependencies
+
+Keep gameplay in src/ and project guidance in this repository. SDK upgrades are
+explicit dependency changes: preserve exact versions, .gamego/sdk.json and the
+frozen lockfile, then rerun game and runtime checks. Installed SDK packages are
+prebuilt; do not rebuild or edit them during ordinary game work. For a requested
+upgrade, use the [sdk-upgrade skill](.agents/skills/sdk-upgrade/SKILL.md).
