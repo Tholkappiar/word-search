@@ -1,12 +1,19 @@
-// Word-search themes, shown as spellbook chapters. Words are uppercase A-Z and at
-// most 12 letters (the grid size). Each theme needs well over WORDS_PER_ROUND words.
+// Word-search categories. Keep words short, common and easy to recognise:
+// uppercase A-Z, 4-8 letters (3-letter words appear in random filler too often).
+// Each category needs well over WORDS_PER_ROUND words so rounds vary.
+// No word may contain another word of its category (forwards or backwards), or
+// typing the shorter one would do nothing. The page shows "Find 10 <label> · Round N".
 export const THEMES = [
-  { name: "Animals", spell: "Spell of the Beasts", words: ["TIGER", "ZEBRA", "PANDA", "KOALA", "OTTER", "RABBIT", "MONKEY", "GIRAFFE", "DOLPHIN", "PENGUIN", "LION", "BEAR", "WOLF", "CAMEL", "HORSE", "EAGLE", "SHARK", "TURTLE", "CHEETAH", "LEOPARD", "HIPPO", "RHINO", "PARROT", "SQUIRREL", "HAMSTER", "BUFFALO", "GORILLA", "FLAMINGO"] },
-  { name: "Food", spell: "Spell of the Feast", words: ["PIZZA", "PASTA", "BURGER", "TACO", "SUSHI", "NOODLE", "MANGO", "APPLE", "BANANA", "COOKIE", "DONUT", "WAFFLE", "CHEESE", "BREAD", "SALAD", "HONEY", "PANCAKE", "CURRY", "POPCORN", "BURRITO", "OMELETTE", "MUFFIN", "PRETZEL", "CUPCAKE", "LASAGNA", "AVOCADO", "BROWNIE", "DUMPLING"] },
-  { name: "Space", spell: "Spell of the Stars", words: ["PLANET", "COMET", "GALAXY", "ROCKET", "ORBIT", "METEOR", "NEBULA", "SATURN", "MARS", "VENUS", "MOON", "STAR", "ALIEN", "ECLIPSE", "JUPITER", "COSMOS", "GRAVITY", "ASTEROID", "SATELLITE", "ASTRONAUT", "TELESCOPE", "MERCURY", "NEPTUNE", "URANUS", "PLUTO", "QUASAR", "STARDUST"] },
-  { name: "Sports", spell: "Spell of Champions", words: ["SOCCER", "TENNIS", "HOCKEY", "GOLF", "RUGBY", "BOXING", "CRICKET", "SKATING", "SURFING", "KARATE", "CHESS", "DARTS", "BOWLING", "CYCLING", "ROWING", "ARCHERY", "BASEBALL", "FOOTBALL", "SWIMMING", "SKIING", "FENCING", "DIVING", "JUDO", "SAILING", "POLO", "RACING"] },
-  { name: "Ocean", spell: "Spell of the Deep", words: ["WHALE", "CORAL", "WAVE", "SHELL", "SQUID", "CRAB", "OCTOPUS", "ANCHOR", "ISLAND", "TIDE", "REEF", "SEAWEED", "LOBSTER", "OYSTER", "SAILOR", "BEACH", "STARFISH", "DOLPHIN", "JELLYFISH", "SEAHORSE", "PEARL", "CURRENT", "HARBOR", "LIGHTHOUSE", "WALRUS", "SEAGULL", "MANTA"] },
-  { name: "Music", spell: "Spell of Song", words: ["GUITAR", "PIANO", "DRUMS", "VIOLIN", "FLUTE", "MELODY", "RHYTHM", "CHORUS", "TEMPO", "BASS", "TRUMPET", "OPERA", "SONG", "BAND", "LYRICS", "BEAT", "CONCERT", "SINGER", "HARMONY", "ALBUM", "BALLAD", "CELLO", "HARP", "ENCORE", "MICROPHONE", "RECORD", "STAGE"] },
-  { name: "Nature", spell: "Spell of the Wild", words: ["FOREST", "RIVER", "MOUNTAIN", "FLOWER", "CANYON", "DESERT", "VALLEY", "MEADOW", "JUNGLE", "LAKE", "CLOUD", "STORM", "RAINBOW", "TREE", "SUNSET", "BREEZE", "VOLCANO", "GLACIER", "WATERFALL", "CAVE", "ISLAND", "PRAIRIE", "BLOSSOM", "THUNDER", "PEBBLE", "MOSS", "SWAMP"] },
-  { name: "Gaming", spell: "Spell of Play", words: ["PLAYER", "LEVEL", "QUEST", "SCORE", "BOSS", "COMBO", "PIXEL", "ARCADE", "CONSOLE", "JOYSTICK", "POWERUP", "SPAWN", "LOOT", "SPEEDRUN", "STREAM", "VICTORY", "CONTROLLER", "CHECKPOINT", "AVATAR", "RESPAWN", "HEALTH", "BONUS", "PUZZLE", "PLATFORM", "SIDEQUEST", "HIGHSCORE"] }
+  { name: "Animals", label: "animals", words: ["LION", "TIGER", "BEAR", "WOLF", "DUCK", "HORSE", "SHEEP", "GOAT", "MOUSE", "RABBIT", "MONKEY", "ZEBRA", "PANDA", "FROG", "CAMEL", "SNAKE", "EAGLE", "SHARK"] },
+  { name: "Fruits", label: "fruits", words: ["APPLE", "MANGO", "GRAPE", "LEMON", "PEACH", "PEAR", "PLUM", "KIWI", "BANANA", "ORANGE", "CHERRY", "MELON", "LIME", "GUAVA", "PAPAYA", "COCONUT"] },
+  { name: "Colors", label: "colors", words: ["BLUE", "PINK", "GREEN", "BLACK", "WHITE", "BROWN", "GREY", "GOLD", "PURPLE", "ORANGE", "YELLOW", "SILVER", "CREAM", "NAVY", "VIOLET", "MAROON"] },
+  { name: "Food", label: "foods", words: ["PIZZA", "BREAD", "RICE", "CAKE", "SOUP", "SALAD", "PASTA", "CHEESE", "BURGER", "COOKIE", "HONEY", "TOAST", "NOODLE", "DONUT", "CANDY", "BUTTER"] },
+  { name: "Body Parts", label: "body parts", words: ["HAND", "FOOT", "HEAD", "NOSE", "MOUTH", "KNEE", "NECK", "ELBOW", "THUMB", "TOOTH", "HEART", "CHIN", "BACK", "FINGER", "TONGUE", "CHEEK"] },
+  { name: "Sports", label: "sports", words: ["GOLF", "TENNIS", "SOCCER", "RUGBY", "HOCKEY", "BOXING", "CHESS", "KARATE", "CRICKET", "SKIING", "SURFING", "DIVING", "ROWING", "DARTS", "JUDO", "POLO"] },
+  { name: "Weather", label: "weather words", words: ["SNOW", "WIND", "STORM", "CLOUD", "SUNNY", "FOGGY", "HAIL", "FROST", "THUNDER", "RAINBOW", "MIST", "HUMID", "BREEZE", "HEAT", "COLD"] },
+  { name: "Home", label: "things at home", words: ["CHAIR", "TABLE", "SOFA", "LAMP", "DOOR", "CLOCK", "BOOK", "SPOON", "PLATE", "KNIFE", "FORK", "SHELF", "BRUSH", "PILLOW", "MIRROR", "WINDOW", "CARPET"] },
+  { name: "Clothes", label: "clothes", words: ["SHIRT", "PANTS", "DRESS", "SKIRT", "SOCKS", "SHOES", "COAT", "SCARF", "GLOVES", "JACKET", "BOOTS", "BELT", "VEST", "JEANS", "SWEATER", "HOODIE"] },
+  { name: "Jobs", label: "jobs", words: ["DOCTOR", "NURSE", "CHEF", "FARMER", "PILOT", "TEACHER", "BAKER", "POLICE", "ARTIST", "SINGER", "DRIVER", "DENTIST", "JUDGE", "WAITER", "ACTOR", "PAINTER"] },
+  { name: "School", label: "school things", words: ["BOOK", "PENCIL", "ERASER", "RULER", "DESK", "PAPER", "CLASS", "LUNCH", "CHALK", "TEST", "MATH", "MUSIC", "GLUE", "SCISSORS", "CRAYON", "TEACHER"] },
+  { name: "Ocean", label: "ocean things", words: ["FISH", "WHALE", "CRAB", "SHARK", "SHELL", "WAVE", "BOAT", "SAND", "CORAL", "SQUID", "SEAL", "DOLPHIN", "OCTOPUS", "BEACH", "TIDE", "ISLAND"] }
 ] as const;
