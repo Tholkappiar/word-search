@@ -8,7 +8,7 @@ or remove working runtime integration merely to add debugging tools.
 
 ## Choose the smallest appropriate integration
 
-### A game already using the bundled engine
+### A game already using the installed SDK engine
 
 1. Inspect `src/game.ts`, the App/driver and package scripts. Reuse the **same engine
    instance** used for live rendering and runtime commands; a second debug-only
@@ -24,12 +24,12 @@ or remove working runtime integration merely to add debugging tools.
    Bounds and the full state schema validate the patch atomically. Keep runtime
    flags/config read-only; use commands or the starting-config editor instead.
 4. Reuse/import `engineDevAdapter` and `registerGameDev` from
-   `@repo/game-dev/browser`. Register `engineDevAdapter(engine)` inside the App's
+   `@bubbleportal/devtools/browser`. Register `engineDevAdapter(engine)` inside the App's
    lifecycle and return its cleanup function when that engine is replaced/unmounted.
    Keep the explicit `VITE_GAMEINSTANCE_DEV_ENABLED === "true"` guard. The helper
    also needs the launcher's `VITE_GAMEINSTANCE_DEBUG_WS_URL`; do not hardcode it.
-5. Verify `dev` runs `gameinstance-dev dev` and `dev:game` runs Vite. Bootstrap builds
-   the pinned protocol, game-kit and game-dev packages in order. Preserve the pnpm
+5. Verify `dev` runs `bubbleportal dev` and `dev:game` runs Vite. Bootstrap installs
+   the pinned, prebuilt SDK and developer tools using the frozen lockfile. Preserve the pnpm
    lockfile and existing runtime entrypoint. `dev:container` must not launch the
    debugger or expose it based on Vite's generic development mode: production
    containers also use Vite. Keep `.gameinstance/` ignored and credentials private.
@@ -115,12 +115,12 @@ Run `corepack pnpm dev` and open its printed game URL. The inspector's edge tab,
 Alt+I and Pin controls open/keep the variable panel visible. Verify real data first:
 
 ```sh
-corepack pnpm exec gameinstance-dev status
-corepack pnpm exec gameinstance-dev state
-corepack pnpm exec gameinstance-dev freeze
-corepack pnpm exec gameinstance-dev step 5
-corepack pnpm exec gameinstance-dev seek 10
-corepack pnpm exec gameinstance-dev replay
+corepack pnpm exec bubbleportal status
+corepack pnpm exec bubbleportal state
+corepack pnpm exec bubbleportal freeze
+corepack pnpm exec bubbleportal step 5
+corepack pnpm exec bubbleportal seek 10
+corepack pnpm exec bubbleportal replay
 ```
 
 Seek requires a tick inside the retained history; choose an actual available tick,
@@ -137,7 +137,7 @@ add appropriate metadata to the real definition only when requested.
 
 ```ts
 import { expect, it } from "vitest";
-import { createGameEngine, defineGame, runGameScenario } from "@repo/game-kit/engine";
+import { createGameEngine, defineGame, runGameScenario } from "@bubbleportal/sdk/engine";
 import { createGame, gameDefinition } from "./game";
 
 function command(type: string, payload: Record<string, unknown> = {}) {
@@ -188,7 +188,7 @@ it("rewinds/replays recorded behavior and scenarios without repeating effects", 
 
 After reproducing and verifying the intended behavior, use the inspector's
 **Capture regression** / **Download JSON**, or run
-`corepack pnpm exec gameinstance-dev scenario record scenarios/name.scenario.json`.
+`corepack pnpm exec bubbleportal scenario record scenarios/name.scenario.json`.
 Recording freezes and captures only through the selected tick/input cursor, with
 an expected state hash; a rewound capture excludes its future. Review the observed
 state before accepting that hash. Use focused equals/range/tolerance assertions

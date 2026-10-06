@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { runGameScenario } from "@repo/game-kit/engine";
+import { runGameScenario } from "@bubbleportal/sdk/engine";
 import { appearsInGrid, createGame, DIRECTIONS, findMentionedWord, gameDefinition, GRID_SIZE, initialConfig, MAX_PLAYERS, wordCells, WORDS_PER_ROUND } from "./game";
 import { THEMES } from "./themes";
 

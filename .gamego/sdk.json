@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "sdkVersion": "0.4.0",
+  "gameContractVersion": "1.0.0",
+  "sdkIdentity": "sha256:ea1705566102847f182eefdb224491872d9186cd40c003ef893ef565532ea4ec",
+  "packages": {
+    "@bubbleportal/sdk": {
+      "version": "0.4.0",
+      "integrity": "sha512-GU8cI8iN+o9lHMzTnUXWEwgdEP/rykJjZl1fb0ThRFfP7rIsmDvhMyqBdNKApr9CHMvke/lcWH++MBdUnykyNQ=="
+    },
+    "@bubbleportal/devtools": {
+      "version": "0.4.0",
+      "integrity": "sha512-z7Xub6ntBI6VNDkjRn6Kl98Ham+UCCQi/O7wuypoSb7Hhg0REwwDFvlFnPn87isLLuui9zt1oc2oaqoP8R0clA=="
+    },
+    "@bubbleportal/protocol": {
+      "version": "0.4.0",
+      "integrity": "sha512-Dbn/lEHDOaRoBrT1kGoh18jAp7t81KluJiMJxd7hQRuDmYRiUXDw/iFBuVi/WHxjqfRgOqr1tMnT0d8v/DGzLA=="
+    }
+  }
+}

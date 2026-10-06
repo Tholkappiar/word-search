@@ -1,6 +1,6 @@
 # Game authoring contract
 
-Read the sections relevant to your change; this reference describes the bundled
+Read the sections relevant to your change; this reference describes the installed
 JavaScript SDK, not a replacement game design. Follow [AGENTS.md](../AGENTS.md)
 for repository-wide rules. The goal is a game that runs locally and honors the
 platform runtime contract. Preserve the starter's working browser transport and
@@ -11,7 +11,7 @@ to adopt or extend it.
 
 ## Working with the existing starter engine
 
-The generated starter already uses `@repo/game-kit/engine`. These conventions
+The generated starter already uses `@bubbleportal/sdk/engine`. These conventions
 keep that implementation correct; the platform wire contract does not require
 every independently authored game to adopt this engine or its debugging features.
 
@@ -41,7 +41,7 @@ scoring, reset or visual overlays. `reload` is rejected by the shared reducer;
 unknown commands are rejected unless you deliberately implement a handler.
 The production wire accepts only `pause`, `resume`, `resetGame`, `showOverlay`,
 `hideOverlay`, `injectChatEvent`, `injectSubscriberEvent`, `setConfig` and `reload`
-(`GameCommandTypeSchema` in `@repo/protocol`). A local custom handler does not
+(`GameCommandTypeSchema` in `@bubbleportal/sdk`). A local custom handler does not
 extend that allowlist; use normalized chat/config for game-specific behavior.
 
 - Gameplay pause sets `state.runtime.paused`; your world systems must obey it.
@@ -115,9 +115,9 @@ shared diagnostics but cannot move/score. Unused celebrations are consumed immed
 
 ```ts
 import { z } from "zod";
-import { NormalizedChatEventSchema } from "@repo/protocol";
-import { applySharedGameCommand, createInitialSharedGameState, parseRuntimeControlCommand } from "@repo/game-kit";
-import { createGameEngine, createSharedGameStateSchema, defineGame, type GameEngineOptions, type SimulationContext } from "@repo/game-kit/engine";
+import { NormalizedChatEventSchema } from "@bubbleportal/sdk";
+import { applySharedGameCommand, createInitialSharedGameState, parseRuntimeControlCommand } from "@bubbleportal/sdk";
+import { createGameEngine, createSharedGameStateSchema, defineGame, type GameEngineOptions, type SimulationContext } from "@bubbleportal/sdk/engine";
 
 export const configSchema = z.object({ speed: z.number().finite().min(0).max(600) }).strict();
 export const initialConfig = { speed: 60 };
@@ -232,7 +232,7 @@ it("uses valid chat to change gameplay and emits an effect after applying it", (
   runtime installs use the frozen lockfile. Keep React, React DOM, Vite and
   TypeScript dependencies and `build`/`dev:container` scripts. Container startup
   must serve Vite on `0.0.0.0` at `SAMPLE_GAME_PORT` (default 5173), without the
-  local inspector launcher. Retain bootstrap/SDK verification and workspace wiring.
+  local inspector launcher. Retain bootstrap, exact SDK dependencies and the frozen lockfile.
 - Keep `gameInstance.gameContractVersion: "1.0.0"` and a nonempty `setConfigPayload`.
   Preserve `VITE_CONTROL_WS_URL`, `createRuntimeCommandClient`, engine dispatch,
   existing deferred-result forwarding and cleanup. The SDK owns socket reconnection and

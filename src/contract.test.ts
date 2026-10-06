@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { RuntimeControlCommand } from "@repo/game-kit";
+import type { RuntimeControlCommand } from "@bubbleportal/sdk";
 import { createGame } from "./game";
 
 const scope = { streamId: "contract-stream", deploymentId: "contract-deployment", runtimeInstanceId: "contract-runtime" };

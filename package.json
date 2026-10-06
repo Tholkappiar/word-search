@@ -9,9 +9,9 @@
     "development": {
       "schemaVersion": 1,
       "toolkit": "gameinstance",
-      "distribution": "bundled",
-      "sdkVersion": "0.3.0",
-      "sdkIdentity": "sha256:6d8c1939368f6ea607bba6c0fdc96b03ac871e0c4640afa83b74724310182ce7",
+      "distribution": "npm",
+      "sdkVersion": "0.4.0",
+      "sdkIdentity": "sha256:ea1705566102847f182eefdb224491872d9186cd40c003ef893ef565532ea4ec",
       "capabilities": [
         "local-simulator",
         "inspector",
@@ -37,22 +37,21 @@
     "build": "vite build",
     "test": "vitest run",
     "test:scenarios": "vitest run src/scenarios.test.ts",
-    "check:runtime": "gameinstance-dev runtime-check",
+    "check:runtime": "bubbleportal runtime-check",
     "runtime:build": "node scripts/build-runtime.mjs",
     "lint": "tsc -p tsconfig.json --noEmit",
-    "dev": "gameinstance-dev dev",
+    "dev": "bubbleportal dev",
     "dev:game": "vite",
     "dev:container": "node scripts/runtime-start.mjs"
   },
   "dependencies": {
-    "@repo/game-kit": "workspace:*",
-    "@repo/protocol": "workspace:*",
+    "@bubbleportal/sdk": "0.4.0",
     "zod": "^3.25.67",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@repo/game-dev": "workspace:*",
+    "@bubbleportal/devtools": "0.4.0",
     "@types/node": "^22.15.30",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",

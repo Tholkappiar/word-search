@@ -1,6 +1,6 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import { healthzPlugin } from "@repo/game-kit/vite";
+import { healthzPlugin } from "@bubbleportal/sdk/vite";
 
 export default defineConfig({
   plugins: [healthzPlugin({ app: "streamforge-game" }), react()],

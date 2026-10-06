@@ -7,7 +7,7 @@ Until you save a fixture, the scenario suite is visibly skipped.
 
 1. Run the game locally and reproduce behavior that should remain stable.
 2. Check that the observed behavior is correct, then freeze at the desired point.
-3. Run corepack pnpm exec gameinstance-dev scenario record
+3. Run corepack pnpm exec bubbleportal scenario record
    scenarios/my-behavior.scenario.json. Alternatively use inspector Capture
    regression, Download JSON, and save with the .scenario.json suffix here.
 4. Run corepack pnpm test:scenarios, review the capture and commit it with the
