@@ -1,19 +1,21 @@
-// Word-search categories. Keep words short, common and easy to recognise:
-// uppercase A-Z, 4-8 letters (3-letter words appear in random filler too often).
-// Each category needs well over WORDS_PER_ROUND words so rounds vary.
+// Word-search categories of very common everyday words: uppercase A-Z, 3 or 4
+// letters. Early levels hide only 3-letter words, later ones 4-letter words, so
+// each category needs at least 4 of each length (see LEVELS in game.ts).
 // No word may contain another word of its category (forwards or backwards), or
-// typing the shorter one would do nothing. The page shows "Find 10 <label> · Round N".
+// typing the shorter one would do nothing. The page shows "Find 2 <many>".
 export const THEMES = [
-  { name: "Animals", label: "animals", words: ["LION", "TIGER", "BEAR", "WOLF", "DUCK", "HORSE", "SHEEP", "GOAT", "MOUSE", "RABBIT", "MONKEY", "ZEBRA", "PANDA", "FROG", "CAMEL", "SNAKE", "EAGLE", "SHARK"] },
-  { name: "Fruits", label: "fruits", words: ["APPLE", "MANGO", "GRAPE", "LEMON", "PEACH", "PEAR", "PLUM", "KIWI", "BANANA", "ORANGE", "CHERRY", "MELON", "LIME", "GUAVA", "PAPAYA", "COCONUT"] },
-  { name: "Colors", label: "colors", words: ["BLUE", "PINK", "GREEN", "BLACK", "WHITE", "BROWN", "GREY", "GOLD", "PURPLE", "ORANGE", "YELLOW", "SILVER", "CREAM", "NAVY", "VIOLET", "MAROON"] },
-  { name: "Food", label: "foods", words: ["PIZZA", "BREAD", "RICE", "CAKE", "SOUP", "SALAD", "PASTA", "CHEESE", "BURGER", "COOKIE", "HONEY", "TOAST", "NOODLE", "DONUT", "CANDY", "BUTTER"] },
-  { name: "Body Parts", label: "body parts", words: ["HAND", "FOOT", "HEAD", "NOSE", "MOUTH", "KNEE", "NECK", "ELBOW", "THUMB", "TOOTH", "HEART", "CHIN", "BACK", "FINGER", "TONGUE", "CHEEK"] },
-  { name: "Sports", label: "sports", words: ["GOLF", "TENNIS", "SOCCER", "RUGBY", "HOCKEY", "BOXING", "CHESS", "KARATE", "CRICKET", "SKIING", "SURFING", "DIVING", "ROWING", "DARTS", "JUDO", "POLO"] },
-  { name: "Weather", label: "weather words", words: ["SNOW", "WIND", "STORM", "CLOUD", "SUNNY", "FOGGY", "HAIL", "FROST", "THUNDER", "RAINBOW", "MIST", "HUMID", "BREEZE", "HEAT", "COLD"] },
-  { name: "Home", label: "things at home", words: ["CHAIR", "TABLE", "SOFA", "LAMP", "DOOR", "CLOCK", "BOOK", "SPOON", "PLATE", "KNIFE", "FORK", "SHELF", "BRUSH", "PILLOW", "MIRROR", "WINDOW", "CARPET"] },
-  { name: "Clothes", label: "clothes", words: ["SHIRT", "PANTS", "DRESS", "SKIRT", "SOCKS", "SHOES", "COAT", "SCARF", "GLOVES", "JACKET", "BOOTS", "BELT", "VEST", "JEANS", "SWEATER", "HOODIE"] },
-  { name: "Jobs", label: "jobs", words: ["DOCTOR", "NURSE", "CHEF", "FARMER", "PILOT", "TEACHER", "BAKER", "POLICE", "ARTIST", "SINGER", "DRIVER", "DENTIST", "JUDGE", "WAITER", "ACTOR", "PAINTER"] },
-  { name: "School", label: "school things", words: ["BOOK", "PENCIL", "ERASER", "RULER", "DESK", "PAPER", "CLASS", "LUNCH", "CHALK", "TEST", "MATH", "MUSIC", "GLUE", "SCISSORS", "CRAYON", "TEACHER"] },
-  { name: "Ocean", label: "ocean things", words: ["FISH", "WHALE", "CRAB", "SHARK", "SHELL", "WAVE", "BOAT", "SAND", "CORAL", "SQUID", "SEAL", "DOLPHIN", "OCTOPUS", "BEACH", "TIDE", "ISLAND"] }
+  { name: "Animals", one: "animal", many: "animals",
+    words: ["CAT", "DOG", "PIG", "COW", "HEN", "FOX", "BEE", "ANT", "OWL", "BAT", "RAT", "LION", "BEAR", "WOLF", "DUCK", "GOAT", "FROG", "FISH", "DEER", "CRAB", "SEAL"] },
+  { name: "Food", one: "food", many: "foods",
+    words: ["EGG", "PIE", "TEA", "JAM", "HAM", "BUN", "NUT", "FIG", "CAKE", "RICE", "SOUP", "MILK", "MEAT", "CORN", "BEAN", "PEAR", "PLUM", "KIWI", "LIME"] },
+  { name: "Body", one: "body part", many: "body parts",
+    words: ["ARM", "LEG", "EYE", "EAR", "LIP", "TOE", "HIP", "JAW", "HAND", "FOOT", "HEAD", "NOSE", "KNEE", "NECK", "CHIN", "BACK", "HAIR", "SKIN"] },
+  { name: "Home", one: "thing at home", many: "things at home",
+    words: ["BED", "CUP", "MAT", "FAN", "POT", "PAN", "RUG", "BOX", "KEY", "DOOR", "LAMP", "SOFA", "BOOK", "DESK", "SINK", "FORK", "BOWL", "BATH"] },
+  { name: "Wear", one: "thing to wear", many: "things to wear",
+    words: ["HAT", "CAP", "TIE", "WIG", "SOCK", "SHOE", "COAT", "BELT", "VEST", "BOOT", "GOWN", "ROBE", "MASK", "RING"] },
+  { name: "Nature", one: "thing in nature", many: "things in nature",
+    words: ["SUN", "SKY", "SEA", "ICE", "MUD", "FOG", "TREE", "RAIN", "SNOW", "WIND", "LEAF", "ROCK", "STAR", "MOON", "LAKE", "HILL"] },
+  { name: "Vehicles", one: "vehicle", many: "vehicles",
+    words: ["CAR", "BUS", "VAN", "JET", "CAB", "BIKE", "BOAT", "SHIP", "TAXI", "JEEP", "TRAM", "SLED", "RAFT"] }
 ] as const;

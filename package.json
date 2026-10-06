@@ -26,8 +26,11 @@
     },
     "setConfigPayload": {
       "game": {
-        "roundSeconds": 300,
-        "revealSeconds": 15
+        "secondsPerWord": 40,
+        "celebrateSeconds": 6,
+        "revealSeconds": 15,
+        "finalLevel": 10,
+        "stopGame": false
       }
     }
   },
