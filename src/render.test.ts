@@ -38,7 +38,7 @@ describe("enchanted forest rendering", () => {
   it("draws the full grid in the 25-60% band with the title, chapter, counter and timer above it", () => {
     const game = createGame(); const state = game.getState(); const original = structuredClone(state);
     const texts = draw(state);
-    const header = ["Enchanted Words", `${THEMES[state.world.themeIndex].spell} · Round 1`, "0/10", "5:00"];
+    const header = ["Enchanted Words", `Find 10 ${THEMES[state.world.themeIndex].label} · Round 1`, "0/10", "5:00"];
     expect(values(texts)).toEqual(expect.arrayContaining(header));
     const letters = texts.filter(entry => /^[A-Z]$/.test(entry.value));
     expect(letters).toHaveLength(144);
@@ -60,19 +60,25 @@ describe("enchanted forest rendering", () => {
     expect(texts).toEqual(expect.arrayContaining(["1/10", "Wordsmith", "found", word]));
     for (const other of others) expect(texts).not.toContain(other);
   });
-  it("shows the round result on the page when every word is found", () => {
+  it("shows the round result above the grid when every word is found", () => {
     const game = createGame();
     for (const word of game.getState().world.words) game.dispatch(chat(word.word, "Solver"));
     game.advance(30);
     const total = game.getState().world.words.reduce((sum, word) => sum + word.word.length, 0);
     const texts = draw(game.getState());
-    const result = texts.filter(entry => ["Spell Complete", `Archmage: Solver  +${total}`].includes(entry.value));
-    expect(result).toHaveLength(2);
-    for (const entry of result) { expect(entry.y).toBeGreaterThan(PUZZLE_TOP); expect(entry.y).toBeLessThan(PUZZLE_BOTTOM); }
+    const gridTop = Math.min(...texts.filter(entry => /^[A-Z]$/.test(entry.value)).map(entry => entry.y));
+    const result = texts.filter(entry => ["All Words Found!", `Top finder: Solver  +${total}`, "Next round in 15s"].includes(entry.value));
+    expect(result).toHaveLength(3);
+    for (const entry of result) expect(entry.y).toBeLessThan(gridTop);
   });
-  it("announces time up and draws a paused overlay", () => {
-    const game = createGame(); game.advance(300 * 60);
-    expect(values(draw(game.getState()))).toEqual(expect.arrayContaining(["The Candle Burns Out", "0 of 10 words were found"]));
+  it("on time up lists the missed words above the grid, and draws a paused overlay", () => {
+    const game = createGame(); const [first, ...rest] = game.getState().world.words.map(word => word.word);
+    game.dispatch(chat(first, "Finder")); game.advance(300 * 60);
+    const texts = draw(game.getState());
+    expect(values(texts)).toEqual(expect.arrayContaining(["The Candle Burns Out", "Time's up · 1 of 10 words found", "You missed (shown in red):"]));
+    const gridTop = Math.min(...texts.filter(entry => /^[A-Z]$/.test(entry.value)).map(entry => entry.y));
+    const missedLines = texts.filter(entry => entry.y < gridTop && rest.some(word => entry.value.split("  ·  ").includes(word)));
+    expect(missedLines.flatMap(entry => entry.value.split("  ·  ")).sort()).toEqual([...rest].sort());
     game.dispatch(command("pause"));
     expect(values(draw(game.getState()))).toContain("Paused");
   });

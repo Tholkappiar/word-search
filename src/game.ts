@@ -15,13 +15,16 @@ export const configSchema = z.object({
   revealSeconds: z.number().int().min(3).max(20)
 }).strict();
 export type GameConfig = z.infer<typeof configSchema>;
-export const initialConfig: GameConfig = { roundSeconds: 300, revealSeconds: 10 };
+export const initialConfig: GameConfig = { roundSeconds: 300, revealSeconds: 15 };
 
 export const GRID_SIZE = 12;
 export const WORDS_PER_ROUND = 10;
 export const MAX_PLAYERS = 100;
 const MAX_NAME_LENGTH = 40;
 const PLACEMENT_ATTEMPTS = 150;
+const PUZZLE_ATTEMPTS = 25, FILL_ATTEMPTS = 8;
+/** Chance a word reads forwards (right, down or diagonally down/up-right); the rest read backwards. */
+const FORWARD_CHANCE = 0.75;
 const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 /** Reading directions as [rowStep, columnStep]: forwards (right, down, down-right, up-right) then backwards (left, up, up-left, down-left). */
 export const DIRECTIONS = [[0, 1], [1, 0], [1, 1], [-1, 1], [0, -1], [-1, 0], [-1, -1], [1, -1]] as const;
@@ -62,6 +65,42 @@ export function wordCells(word: Pick<PlacedWord, "word" | "row" | "column" | "di
 function randomInt(context: SimulationContext, min: number, max: number): number {
   return min + Math.floor(context.random() * (max - min + 1));
 }
+/** Whether a word can be read anywhere in the grid, in any direction. */
+export function appearsInGrid(grid: string, word: string): boolean {
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let column = 0; column < GRID_SIZE; column++) {
+      if (grid[row * GRID_SIZE + column] !== word[0]) continue;
+      for (const [rowStep, columnStep] of DIRECTIONS) {
+        const endRow = row + rowStep * (word.length - 1), endColumn = column + columnStep * (word.length - 1);
+        if (endRow < 0 || endRow >= GRID_SIZE || endColumn < 0 || endColumn >= GRID_SIZE) continue;
+        if ([...word].every((letter, index) => grid[(row + rowStep * index) * GRID_SIZE + column + columnStep * index] === letter)) return true;
+      }
+    }
+  }
+  return false;
+}
+/** Places up to WORDS_PER_ROUND words from the pool into empty cells, crossing only on shared letters. */
+function placeWords(context: SimulationContext, pool: readonly string[], cells: string[]): PlacedWord[] {
+  const words: PlacedWord[] = [];
+  for (const word of pool) {
+    if (words.length === WORDS_PER_ROUND) break;
+    for (let attempt = 0; attempt < PLACEMENT_ATTEMPTS; attempt++) {
+      // Directions 0-3 read forwards, 4-7 backwards; favour forwards so words are easier to spot.
+      const direction = randomInt(context, 0, 3) + (context.random() < FORWARD_CHANCE ? 0 : 4);
+      const [rowStep, columnStep] = DIRECTIONS[direction];
+      const span = word.length - 1;
+      const row = rowStep === 1 ? randomInt(context, 0, GRID_SIZE - 1 - span) : rowStep === -1 ? randomInt(context, span, GRID_SIZE - 1) : randomInt(context, 0, GRID_SIZE - 1);
+      const column = columnStep === 1 ? randomInt(context, 0, GRID_SIZE - 1 - span) : columnStep === -1 ? randomInt(context, span, GRID_SIZE - 1) : randomInt(context, 0, GRID_SIZE - 1);
+      const placed = { word, row, column, direction, foundBy: "", foundAtMs: 0 };
+      const path = wordCells(placed);
+      if (!path.every(([r, c], index) => cells[r * GRID_SIZE + c] === "" || cells[r * GRID_SIZE + c] === word[index])) continue;
+      path.forEach(([r, c], index) => { cells[r * GRID_SIZE + c] = word[index]; });
+      words.push(placed);
+      break;
+    }
+  }
+  return words;
+}
 /** Builds a themed grid with up to WORDS_PER_ROUND words, using only engine randomness. */
 export function generatePuzzle(context: SimulationContext, excludeTheme?: number): Pick<World, "themeIndex" | "grid" | "words"> {
   const themeIndex = excludeTheme === undefined ? randomInt(context, 0, THEMES.length - 1)
@@ -70,27 +109,21 @@ export function generatePuzzle(context: SimulationContext, excludeTheme?: number
   for (let index = pool.length - 1; index > 0; index--) {
     const swap = randomInt(context, 0, index); [pool[index], pool[swap]] = [pool[swap], pool[index]];
   }
-  const cells: string[] = Array(GRID_SIZE * GRID_SIZE).fill("");
-  const words: PlacedWord[] = [];
-  for (const word of pool) {
-    if (words.length === WORDS_PER_ROUND) break;
-    for (let attempt = 0; attempt < PLACEMENT_ATTEMPTS; attempt++) {
-      const direction = randomInt(context, 0, DIRECTIONS.length - 1);
-      const [rowStep, columnStep] = DIRECTIONS[direction];
-      const span = word.length - 1;
-      const row = rowStep === 1 ? randomInt(context, 0, GRID_SIZE - 1 - span) : rowStep === -1 ? randomInt(context, span, GRID_SIZE - 1) : randomInt(context, 0, GRID_SIZE - 1);
-      const column = columnStep === 1 ? randomInt(context, 0, GRID_SIZE - 1 - span) : columnStep === -1 ? randomInt(context, span, GRID_SIZE - 1) : randomInt(context, 0, GRID_SIZE - 1);
-      const placed = { word, row, column, direction, foundBy: "", foundAtMs: 0 };
-      const path = wordCells(placed);
-      // Words may cross only where they share the same letter.
-      if (!path.every(([r, c], index) => cells[r * GRID_SIZE + c] === "" || cells[r * GRID_SIZE + c] === word[index])) continue;
-      path.forEach(([r, c], index) => { cells[r * GRID_SIZE + c] = word[index]; });
-      words.push(placed);
-      break;
+  // Rebuild until no other category word appears by accident (viewers would type it and
+  // nothing would happen). Refilling random letters fixes most cases; a word formed by
+  // crossing hidden words needs a fresh placement.
+  let puzzle = { grid: "", words: [] as PlacedWord[] };
+  for (let attempt = 0; attempt < PUZZLE_ATTEMPTS; attempt++) {
+    const cells: string[] = Array(GRID_SIZE * GRID_SIZE).fill("");
+    const words = placeWords(context, pool, cells);
+    const hidden = new Set(words.map(word => word.word));
+    const others = THEMES[themeIndex].words.filter(word => !hidden.has(word));
+    for (let fill = 0; fill < FILL_ATTEMPTS; fill++) {
+      puzzle = { grid: cells.map(cell => cell || LETTERS[randomInt(context, 0, LETTERS.length - 1)]).join(""), words };
+      if (!others.some(word => appearsInGrid(puzzle.grid, word))) return { themeIndex, ...puzzle };
     }
   }
-  const grid = cells.map(cell => cell || LETTERS[randomInt(context, 0, LETTERS.length - 1)]).join("");
-  return { themeIndex, grid, words };
+  return { themeIndex, ...puzzle };
 }
 function newRound(world: Pick<World, "elapsedMs" | "round" | "scores">, context: SimulationContext, config: GameConfig, excludeTheme?: number): World {
   return { elapsedMs: world.elapsedMs, round: world.round, scores: world.scores, ...generatePuzzle(context, excludeTheme),
@@ -113,7 +146,7 @@ export function findMentionedWord(words: readonly PlacedWord[], text: string): P
 }
 
 export const gameDefinition = defineGame({
-  id: "game_f2890037c53ba1969ae994faae65d30eea8f134ada66ee2bb9d764ad49897f40", schemaVersion: "7", simulationRevision: "8", stateSchema, configSchema, inputSchema: z.unknown().transform(parseRuntimeControlCommand),
+  id: "game_f2890037c53ba1969ae994faae65d30eea8f134ada66ee2bb9d764ad49897f40", schemaVersion: "8", simulationRevision: "9", stateSchema, configSchema, inputSchema: z.unknown().transform(parseRuntimeControlCommand),
   // Add bounded inspector metadata only for game variables you want editable.
   initialConfig, inspector: {},
   createInitialState(config, context) {

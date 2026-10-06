@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { runGameScenario } from "@repo/game-kit/engine";
-import { createGame, DIRECTIONS, findMentionedWord, gameDefinition, GRID_SIZE, initialConfig, MAX_PLAYERS, wordCells, WORDS_PER_ROUND } from "./game";
+import { appearsInGrid, createGame, DIRECTIONS, findMentionedWord, gameDefinition, GRID_SIZE, initialConfig, MAX_PLAYERS, wordCells, WORDS_PER_ROUND } from "./game";
 import { THEMES } from "./themes";
 
 const TICKS_PER_SECOND = 60;
@@ -41,6 +41,28 @@ describe("word search puzzles", () => {
     for (let seed = 1; seed <= 25; seed++) for (const word of createGame({ seed }).getState().world.words) used.add(word.direction);
     expect([...used].sort()).toEqual(DIRECTIONS.map((_, index) => index));
   });
+  it("keeps category words simple and never nested inside each other", () => {
+    for (const theme of THEMES) {
+      expect(theme.words.length).toBeGreaterThan(WORDS_PER_ROUND + 4);
+      for (const word of theme.words) {
+        expect(word).toMatch(/^[A-Z]{4,8}$/);
+        for (const other of theme.words) if (other !== word) expect(other.includes(word) || other.includes([...word].reverse().join("")), `${word} in ${other}`).toBe(false);
+      }
+    }
+  });
+  it("never shows a category word by accident that is not one of the hidden words", () => {
+    for (let seed = 1; seed <= 40; seed++) {
+      const { world } = createGame({ seed }).getState();
+      const hidden = new Set(world.words.map(word => word.word));
+      for (const word of THEMES[world.themeIndex].words) if (!hidden.has(word)) expect(appearsInGrid(world.grid, word), `${word} (seed ${seed})`).toBe(false);
+      for (const word of world.words) expect(appearsInGrid(world.grid, word.word)).toBe(true);
+    }
+  });
+  it("mostly places words reading forwards", () => {
+    let forwards = 0, total = 0;
+    for (let seed = 1; seed <= 40; seed++) for (const word of createGame({ seed }).getState().world.words) { total++; if (word.direction < 4) forwards++; }
+    expect(forwards / total).toBeGreaterThan(0.6);
+  });
   it("finds a hidden word anywhere in a chat message, as a whole word", () => {
     const { world } = createGame().getState(); const target = world.words[0].word;
     expect(findMentionedWord(world.words, `found ${target.toLowerCase()}!!`)?.word).toBe(target);
@@ -72,8 +94,8 @@ describe("word search gameplay", () => {
     const game = createGame(); const first = game.getState().world;
     clearBoard(game);
     const total = first.words.reduce((sum, word) => sum + word.word.length, 0);
-    expect(game.getState().world).toMatchObject({ phase: "cleared", phaseMsLeft: 10_000, scores: [{ name: "Player One", points: total }] });
-    game.advance(10 * TICKS_PER_SECOND);
+    expect(game.getState().world).toMatchObject({ phase: "cleared", phaseMsLeft: 15_000, scores: [{ name: "Player One", points: total }] });
+    game.advance(15 * TICKS_PER_SECOND);
     const world = game.getState().world;
     expect(world).toMatchObject({ phase: "playing", round: 2, phaseMsLeft: 300_000, scores: [{ name: "Player One", points: total }] });
     expect(world.themeIndex).not.toBe(first.themeIndex);
@@ -86,7 +108,7 @@ describe("word search gameplay", () => {
     game.advance(1);
     expect(game.getState().world).toMatchObject({ phase: "timeout", round: 1 });
     expect(game.dispatch(chatCommand(hidden(game)[0], "too-late"))).toMatchObject({ result: { chatCommands: [] } });
-    game.advance(10 * TICKS_PER_SECOND);
+    game.advance(15 * TICKS_PER_SECOND);
     expect(game.getState().world).toMatchObject({ phase: "playing", round: 2 });
   });
   it("ranks players and keeps the leaderboard bounded", () => {
@@ -116,7 +138,7 @@ describe("word search gameplay", () => {
   });
   it("reset builds a fresh puzzle, clears scores and restores the default config", () => {
     const game = createGame();
-    clearBoard(game); game.advance(11 * TICKS_PER_SECOND);
+    clearBoard(game); game.advance(16 * TICKS_PER_SECOND);
     game.dispatch(chatCommand(hidden(game)[0], "find"));
     game.dispatch(command("setConfig", { game: { roundSeconds: 60 } }));
     game.dispatch(command("pause"));
@@ -128,13 +150,13 @@ describe("word search gameplay", () => {
     expect(world).toMatchObject({ phase: "playing", phaseMsLeft: 300_000, phaseAtMs: 0, elapsedMs: 0, round: 1, scores: [] });
     expect(world.words.every(word => word.foundBy === "" && word.foundAtMs === 0)).toBe(true);
     expect(world.grid).not.toBe(before.grid);
-    expect(game.getSnapshot().tick).toBe(11 * TICKS_PER_SECOND); // A command reset is not an engine restart.
+    expect(game.getSnapshot().tick).toBe(16 * TICKS_PER_SECOND); // A command reset is not an engine restart.
   });
   it("applies valid config from the next round and rejects invalid config without changes", () => {
     const game = createGame();
     expect(game.dispatch(command("setConfig", { game: { roundSeconds: 60 } }))).toMatchObject({ result: { status: "applied" } });
     expect(game.getState().world.phaseMsLeft).toBe(300_000);
-    game.advance(310 * TICKS_PER_SECOND);
+    game.advance(315 * TICKS_PER_SECOND);
     expect(game.getState().world).toMatchObject({ round: 2, phaseMsLeft: 60_000 });
     const original = game.getState();
     for (const patch of [{ roundSeconds: 5 }, { revealSeconds: 0 }, { roundSeconds: 90.5 }, { unregistered: true }]) {

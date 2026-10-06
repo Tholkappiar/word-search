@@ -7,9 +7,9 @@ import { GRID_SIZE, wordCells, type GameState, type PlacedWord } from "./game";
 // 1080x1920 canvas; the painted forest is shifted down so its moon and stag show below.
 type Ctx = CanvasRenderingContext2D;
 const INK = "#24160c", SEPIA = "#6b4423", GOLD = "#f3d27c", RED_INK = "#9b1c1c", NIGHT = "#091510";
-/** Translucent magical inks for found words: gold, emerald, ruby, sapphire, amethyst... */
-const INKS = ["rgba(212, 160, 23, 0.5)", "rgba(16, 150, 100, 0.42)", "rgba(200, 30, 60, 0.36)", "rgba(37, 99, 235, 0.34)", "rgba(126, 34, 206, 0.36)",
-  "rgba(234, 108, 10, 0.42)", "rgba(13, 128, 118, 0.42)", "rgba(190, 24, 93, 0.34)", "rgba(67, 56, 202, 0.36)", "rgba(77, 124, 15, 0.42)"];
+/** Translucent magical inks for found words. No reds: red marks missed words when time runs out. */
+const INKS = ["rgba(212, 160, 23, 0.5)", "rgba(16, 150, 100, 0.42)", "rgba(6, 160, 200, 0.4)", "rgba(37, 99, 235, 0.34)", "rgba(126, 34, 206, 0.36)",
+  "rgba(234, 140, 10, 0.42)", "rgba(13, 128, 118, 0.42)", "rgba(146, 90, 30, 0.38)", "rgba(67, 56, 202, 0.36)", "rgba(77, 124, 15, 0.42)"];
 const PAGE = { x: 40, y: 432, width: 1000, height: 752 };
 const CELL_W = 74, CELL_H = 52, GRID_X = 96, GRID_Y = 516;
 const EMBLEM_Y = 88, TITLE_Y = 218, CHAPTER_Y = 284, TOAST_Y = 362, STATUS_Y = 478;
@@ -108,7 +108,7 @@ function drawTitle(ctx: Ctx, state: GameState): void {
   ctx.shadowBlur = 18; ctx.fillText("Enchanted Words", 540, TITLE_Y);
   ctx.restore();
   // Chapter line with ornamental rules.
-  const chapter = `${THEMES[world.themeIndex].spell} · Round ${world.round}`;
+  const chapter = `Find ${world.words.length} ${THEMES[world.themeIndex].label} · Round ${world.round}`;
   text(ctx, chapter, 540, CHAPTER_Y, 36, "#e8d6a8", FLAVOR_FONT);
   const half = ctx.measureText(chapter).width / 2;
   ctx.strokeStyle = "rgba(232, 214, 168, 0.5)"; ctx.lineWidth = 2;
@@ -153,7 +153,7 @@ function drawGrid(ctx: Ctx, state: GameState): void {
     const missed = !word.foundBy && world.phase === "timeout";
     if (!word.foundBy && !missed) return;
     const start = word.foundBy ? word.foundAtMs : world.phaseAtMs;
-    drawHighlight(ctx, word, missed ? "rgba(155, 28, 28, 0.3)" : INKS[index % INKS.length], easeOutCubic(clamp01((world.elapsedMs - start) / HIGHLIGHT_MS)));
+    drawHighlight(ctx, word, missed ? "rgba(185, 28, 28, 0.42)" : INKS[index % INKS.length], easeOutCubic(clamp01((world.elapsedMs - start) / HIGHLIGHT_MS)));
     for (const [r, c] of wordCells(word)) covered.add(r * GRID_SIZE + c);
   });
   for (let row = 0; row < GRID_SIZE; row++) {
@@ -203,7 +203,18 @@ function drawToast(ctx: Ctx, state: GameState): void {
   ctx.restore();
 }
 
-/** Round result scroll across the middle of the page; the grid stays visible around it. */
+/** Splits words into centred lines no wider than maxWidth in the current font. */
+function wrapWords(ctx: Ctx, words: string[], separator: string, maxWidth: number): string[] {
+  const lines: string[] = [];
+  for (const word of words) {
+    const last = lines[lines.length - 1];
+    if (last !== undefined && ctx.measureText(last + separator + word).width <= maxWidth) lines[lines.length - 1] = last + separator + word;
+    else lines.push(word);
+  }
+  return lines;
+}
+
+/** Round result scroll on the sky above the page, so the solved grid (missed words in red) stays visible. */
 function drawRoundEnd(ctx: Ctx, state: GameState): void {
   const { world } = state;
   const age = world.elapsedMs - world.phaseAtMs;
@@ -212,22 +223,32 @@ function drawRoundEnd(ctx: Ctx, state: GameState): void {
   for (const word of world.words) if (word.foundBy) letters.set(word.foundBy, (letters.get(word.foundBy) ?? 0) + word.word.length);
   const [mvp, mvpPoints] = [...letters].sort((left, right) => right[1] - left[1])[0] ?? ["", 0];
   const found = world.words.filter(word => word.foundBy).length;
+  ctx.font = `400 30px ${LETTER_FONT}`;
+  const missed = wrapWords(ctx, world.words.filter(word => !word.foundBy).map(word => word.word), "  ·  ", 780);
   const scale = easeOutBack(clamp01(age / 450));
-  ctx.save(); ctx.translate(540, 824); ctx.scale(scale, scale);
+  ctx.save(); ctx.translate(540, 226); ctx.scale(scale, scale);
   ctx.shadowColor = "rgba(0, 0, 0, 0.6)"; ctx.shadowBlur = 30;
-  const scroll = ctx.createLinearGradient(0, -150, 0, 150); scroll.addColorStop(0, "#f8ecd0"); scroll.addColorStop(1, "#e4cb95");
-  rounded(ctx, -430, -150, 860, 300, 16, scroll, "#7a5418", 3);
+  const scroll = ctx.createLinearGradient(0, -186, 0, 186); scroll.addColorStop(0, "#f8ecd0"); scroll.addColorStop(1, "#e4cb95");
+  rounded(ctx, -440, -186, 880, 372, 16, scroll, "#7a5418", 3);
   ctx.shadowBlur = 0;
-  for (const side of [-1, 1]) rounded(ctx, side * 430 - 20, -164, 40, 328, 20, "#3a2412", "#a57a24", 2);
-  text(ctx, complete ? "Spell Complete" : "The Candle Burns Out", 0, -86, complete ? 60 : 50, complete ? INK : RED_INK, TITLE_FONT);
-  text(ctx, complete ? "Every hidden word was found" : `${found} of ${world.words.length} words were found`, 0, -22, 38, SEPIA, FLAVOR_FONT);
-  if (mvp) text(ctx, `Archmage: ${shorten(mvp, 14)}  +${mvpPoints}`, 0, 40, 38, INK, LETTER_FONT);
-  text(ctx, `Next spell in ${Math.ceil(world.phaseMsLeft / 1000)}s`, 0, 100, 30, SEPIA, FLAVOR_FONT);
+  for (const side of [-1, 1]) rounded(ctx, side * 440 - 20, -200, 40, 400, 20, "#3a2412", "#a57a24", 2);
+  // Centre the block vertically: fewer missed-word lines start it lower.
+  let y = missed.length ? -148 + (3 - Math.min(3, missed.length)) * 17 : -100;
+  text(ctx, complete ? "All Words Found!" : "The Candle Burns Out", 0, y, complete ? 58 : 50, complete ? INK : RED_INK, TITLE_FONT);
+  y += 56;
+  text(ctx, complete ? "Amazing teamwork, chat!" : `Time's up · ${found} of ${world.words.length} words found`, 0, y, 34, SEPIA, FLAVOR_FONT);
+  if (missed.length) {
+    y += 42; text(ctx, "You missed (shown in red):", 0, y, 26, SEPIA, FLAVOR_FONT);
+    for (const line of missed) { y += 34; text(ctx, line, 0, y, 30, RED_INK, LETTER_FONT); }
+  }
+  y += missed.length ? 46 : 66;
+  if (mvp) { text(ctx, `Top finder: ${shorten(mvp, 14)}  +${mvpPoints}`, 0, y, 34, INK, LETTER_FONT); y += 44; }
+  text(ctx, `Next round in ${Math.ceil(world.phaseMsLeft / 1000)}s`, 0, y, 28, SEPIA, FLAVOR_FONT);
   ctx.restore();
   if (complete) {
-    // Golden star shower.
+    // Golden star shower over the sky and page.
     for (let index = 0; index < 70; index++) {
-      const y = 300 - noise(index + 400) * 300 + age * (0.25 + noise(index + 300) * 0.3);
+      const y = -20 - noise(index + 400) * 300 + age * (0.25 + noise(index + 300) * 0.3);
       if (y > 1300) continue;
       star(ctx, noise(index) * 1080 + Math.sin(age / 400 + index) * 20, y, 8 + noise(index + 9) * 10, index % 4 === 0 ? "#fff3c4" : GOLD);
     }
@@ -239,7 +260,8 @@ export function renderGame(context: Ctx, state: GameState): void {
   context.clearRect(0, 0, width, height);
   drawBackground(context, state.world.elapsedMs);
   drawPage(context);
-  drawTitle(context, state);
+  // The round result scroll replaces the title area between rounds.
+  if (state.world.phase === "playing") drawTitle(context, state);
   drawStatus(context, state);
   drawGrid(context, state);
   drawToast(context, state);

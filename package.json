@@ -27,7 +27,7 @@
     "setConfigPayload": {
       "game": {
         "roundSeconds": 300,
-        "revealSeconds": 10
+        "revealSeconds": 15
       }
     }
   },
