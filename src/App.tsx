@@ -4,6 +4,7 @@ import { buildRejectedCommandResult } from "@bubbleportal/sdk";
 import { engineDevAdapter, registerGameDev } from "@bubbleportal/devtools/browser";
 import { createGame, gameDefinition } from "./game";
 import { renderGame } from "./render";
+import { GameAudio } from "./audio";
 import "./styles.css";
 
 export function App() {
@@ -36,6 +37,13 @@ export function App() {
     const context = canvas.current?.getContext("2d");
     if (context) renderGame(context, state);
   }, [state, renderGame]);
+  // Music and sound effects follow the state like the renderer does; they never affect gameplay.
+  const audio = useRef<GameAudio | undefined>(undefined);
+  useEffect(() => {
+    const player = new GameAudio(); player.start(); audio.current = player;
+    return () => { player.dispose(); if (audio.current === player) audio.current = undefined; };
+  }, []);
+  useEffect(() => { audio.current?.update(state); }, [state]);
   useEffect(() => {
     if (import.meta.env.VITE_GAMEINSTANCE_DEV_ENABLED !== "true") return;
     return registerGameDev(engineDevAdapter(engine));

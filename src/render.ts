@@ -25,7 +25,7 @@ const GRID_TOP = 552, GRID_AREA = 480, SLOTS_Y = 1128;
 const ART_SHIFT = 380;
 const INTRO_MS = 1700, SPOTLIGHT_MS = 3400, BURST_MS = 3600, POP_MS = 380;
 /** After the last word of a level, its finder gets the spotlight before the result scroll arrives. */
-const RESULT_DELAY_MS = 1700;
+export const RESULT_DELAY_MS = 1700;
 
 /** Deterministic 0..1 noise so decorations never flicker or touch game randomness. */
 function noise(seed: number): number { const value = Math.sin(seed * 12.9898) * 43758.5453; return value - Math.floor(value); }

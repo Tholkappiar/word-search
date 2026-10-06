@@ -30,7 +30,9 @@
         "celebrateSeconds": 6,
         "revealSeconds": 15,
         "finalLevel": 10,
-        "stopGame": false
+        "stopGame": false,
+        "musicVolume": 50,
+        "soundVolume": 70
       }
     }
   },

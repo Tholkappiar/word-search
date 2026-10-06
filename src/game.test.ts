@@ -261,7 +261,7 @@ describe("word search gameplay", () => {
     game.advance(4 * TICKS_PER_SECOND);
     expect(game.getState().world).toMatchObject({ level: 2, phaseMsLeft: 40_000 });
     const original = game.getState();
-    for (const patch of [{ secondsPerWord: 5 }, { celebrateSeconds: 0 }, { revealSeconds: 60 }, { secondsPerWord: 30.5 }, { finalLevel: -1 }, { finalLevel: 51 }, { stopGame: "yes" }, { unregistered: true }]) {
+    for (const patch of [{ secondsPerWord: 5 }, { celebrateSeconds: 0 }, { revealSeconds: 60 }, { secondsPerWord: 30.5 }, { finalLevel: -1 }, { finalLevel: 51 }, { stopGame: "yes" }, { musicVolume: -1 }, { soundVolume: 101 }, { musicVolume: 50.5 }, { unregistered: true }]) {
       expect(() => game.dispatch(command("setConfig", { game: patch }))).toThrow();
       expect(game.getState()).toEqual(original);
     }

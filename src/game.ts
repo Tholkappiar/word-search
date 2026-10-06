@@ -25,10 +25,13 @@ export const configSchema = z.object({
   /** Clearing this level ends the game; 0 plays forever. Read when a level is cleared. */
   finalLevel: z.number().int().min(0).max(50),
   /** Manual stop: true ends the game now on the results screen; false again starts a new game. */
-  stopGame: z.boolean()
+  stopGame: z.boolean(),
+  /** Background music and sound effect loudness, 0 (off) to 100. Presentation only. */
+  musicVolume: z.number().int().min(0).max(100),
+  soundVolume: z.number().int().min(0).max(100)
 }).strict();
 export type GameConfig = z.infer<typeof configSchema>;
-export const initialConfig: GameConfig = { secondsPerWord: 40, celebrateSeconds: 6, revealSeconds: 15, finalLevel: 10, stopGame: false };
+export const initialConfig: GameConfig = { secondsPerWord: 40, celebrateSeconds: 6, revealSeconds: 15, finalLevel: 10, stopGame: false, musicVolume: 50, soundVolume: 70 };
 
 /** Reading directions as [rowStep, columnStep]: forwards (right, down, down-right, up-right) then backwards (left, up, up-left, down-left). */
 export const DIRECTIONS = [[0, 1], [1, 0], [1, 1], [-1, 1], [0, -1], [-1, 0], [-1, -1], [1, -1]] as const;
@@ -200,7 +203,7 @@ export function findMentionedWord(words: readonly PlacedWord[], text: string): P
 }
 
 export const gameDefinition = defineGame({
-  id: "game_f2890037c53ba1969ae994faae65d30eea8f134ada66ee2bb9d764ad49897f40", schemaVersion: "11", simulationRevision: "12", stateSchema, configSchema, inputSchema: z.unknown().transform(parseRuntimeControlCommand),
+  id: "game_f2890037c53ba1969ae994faae65d30eea8f134ada66ee2bb9d764ad49897f40", schemaVersion: "12", simulationRevision: "12", stateSchema, configSchema, inputSchema: z.unknown().transform(parseRuntimeControlCommand),
   // Add bounded inspector metadata only for game variables you want editable.
   initialConfig, inspector: {},
   createInitialState(config, context) {
