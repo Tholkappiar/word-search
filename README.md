@@ -20,7 +20,7 @@ checks. These commands work on Windows and Unix.
 
 ## Build your game
 
-Read [AGENTS.md](AGENTS.md), the [game-development skill](.agents/skills/game-development/SKILL.md)
+Read [AGENTS.md](AGENTS.md), the [game-development skill](.agents/skills/bubbleportal-game/SKILL.md)
 and the [basic compatibility contract](docs/GAME_AUTHORING.md).
 
 The starter draws a blank 1080 x 1920 canvas. Add gameplay state, configuration,
@@ -62,7 +62,7 @@ requirements described in the compatibility reference.
 The starter includes testing infrastructure, but using the variable panel,
 editable fields, freeze, rewind or scenario capture is not required to make a
 platform-compatible game. After building your game, ask to use the
-[game-testing skill](.agents/skills/game-testing/SKILL.md) to integrate or configure
+[game-testing skill](.agents/skills/bubbleportal-game/SKILL.md) to integrate or configure
 those tools for its variables and behavior. Leave the existing plumbing intact;
 there is no need to configure every advanced feature before making the game.
 
@@ -72,4 +72,4 @@ Keep gameplay in src/ and project guidance in this repository. SDK upgrades are
 explicit dependency changes: preserve exact versions, .gamego/sdk.json and the
 frozen lockfile, then rerun game and runtime checks. Installed SDK packages are
 prebuilt; do not rebuild or edit them during ordinary game work. For a requested
-upgrade, use the [sdk-upgrade skill](.agents/skills/sdk-upgrade/SKILL.md).
+upgrade, use the [sdk-upgrade skill](.agents/skills/bubbleportal-game/SKILL.md).

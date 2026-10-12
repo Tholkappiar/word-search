@@ -10,8 +10,8 @@
       "schemaVersion": 1,
       "toolkit": "gameinstance",
       "distribution": "npm",
-      "sdkVersion": "0.4.0",
-      "sdkIdentity": "sha256:ea1705566102847f182eefdb224491872d9186cd40c003ef893ef565532ea4ec",
+      "sdkVersion": "0.5.2",
+      "sdkIdentity": "sha256:c989ee9f8681b9d1cc5bcaf8bb85b79c4c9866643b32aa15ec290f1716661a6c",
       "capabilities": [
         "local-simulator",
         "inspector",
@@ -41,6 +41,7 @@
     "bootstrap": "node scripts/bootstrap.mjs",
     "doctor": "node scripts/bootstrap.mjs --check",
     "build": "vite build",
+    "build:play": "vite build --mode play --outDir dist-play --emptyOutDir",
     "test": "vitest run",
     "test:scenarios": "vitest run src/scenarios.test.ts",
     "check:runtime": "bubbleportal runtime-check",
@@ -53,20 +54,20 @@
     "voice:lipsync": "node scripts/lipsync-voice.mjs"
   },
   "dependencies": {
-    "@bubbleportal/sdk": "0.4.0",
     "@rive-app/canvas": "2.44.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "zod": "^3.25.67"
+    "zod": "^3.25.67",
+    "@bubbleportal/sdk": "0.5.2"
   },
   "devDependencies": {
-    "@bubbleportal/devtools": "0.4.0",
     "@types/node": "^22.15.30",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.5.2",
     "typescript": "^5.8.3",
     "vite": "^6.3.5",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "@bubbleportal/devtools": "0.5.2"
   }
 }

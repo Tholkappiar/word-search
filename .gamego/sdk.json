@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.4.0",
+  "sdkVersion": "0.5.2",
   "gameContractVersion": "1.0.0",
-  "sdkIdentity": "sha256:ea1705566102847f182eefdb224491872d9186cd40c003ef893ef565532ea4ec",
+  "sdkIdentity": "sha256:c989ee9f8681b9d1cc5bcaf8bb85b79c4c9866643b32aa15ec290f1716661a6c",
   "packages": {
     "@bubbleportal/sdk": {
-      "version": "0.4.0",
-      "integrity": "sha512-GU8cI8iN+o9lHMzTnUXWEwgdEP/rykJjZl1fb0ThRFfP7rIsmDvhMyqBdNKApr9CHMvke/lcWH++MBdUnykyNQ=="
+      "version": "0.5.2",
+      "integrity": "sha512-AAMZpnwI0YjVOPzFjra+X/lgXLxEwlNaU9tjqiNaZ3RgvcVo9qfYB4jwXMhDxdHBt7Nhoucey8C0yBpEuwitpg=="
     },
     "@bubbleportal/devtools": {
-      "version": "0.4.0",
-      "integrity": "sha512-z7Xub6ntBI6VNDkjRn6Kl98Ham+UCCQi/O7wuypoSb7Hhg0REwwDFvlFnPn87isLLuui9zt1oc2oaqoP8R0clA=="
+      "version": "0.5.2",
+      "integrity": "sha512-BhbOScZ16vgvrjH3Zwn3rhppBH12dZGC42/sqnM3+ux7T+D+JIQDTDtmWDOBDaqSWNDCUCql7/0x8F/ZETm4kg=="
     },
     "@bubbleportal/protocol": {
-      "version": "0.4.0",
-      "integrity": "sha512-Dbn/lEHDOaRoBrT1kGoh18jAp7t81KluJiMJxd7hQRuDmYRiUXDw/iFBuVi/WHxjqfRgOqr1tMnT0d8v/DGzLA=="
+      "version": "0.5.2",
+      "integrity": "sha512-1DC1qKbSMgAyz40qp00MRrPv9bTj7j9wIqA8t2sn8FuL2N6ZnYREIhtr73aveD/HhE6ouK3PkEdDI8RzXnIXqw=="
     }
   }
 }

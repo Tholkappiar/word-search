@@ -1,6 +1,6 @@
 # Optional local game testing integration
 
-Use this reference with the [game-testing skill](../.agents/skills/game-testing/SKILL.md)
+Use this reference with the [game-testing skill](../.agents/skills/bubbleportal-game/SKILL.md)
 when the user asks for the variable panel, editable state, freeze/step/rewind,
 deterministic replay or regression capture. These are **not** prerequisites for
 the [platform game contract](GAME_AUTHORING.md). Do not redesign an existing game

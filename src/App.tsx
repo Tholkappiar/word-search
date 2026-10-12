@@ -1,21 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import { createRuntimeCommandClient, type RuntimeCommandClient } from "@bubbleportal/sdk/browser";
 import { buildRejectedCommandResult } from "@bubbleportal/sdk";
-import { engineDevAdapter, registerGameDev } from "@bubbleportal/devtools/browser";
 import { createGame, gameDefinition } from "./game";
 import { renderGame } from "./render";
 import { GameAudio } from "./audio";
 import { Mascot } from "./mascot";
 import "./styles.css";
 
+// `build:play` builds in Vite's "play" mode for streaming: no engine history and no development inspector.
+const PLAY = import.meta.env.MODE === "play";
+const createAppGame = () => createGame({ recordHistory: !PLAY });
+
 export function App() {
-  const [engine, setEngine] = useState(createGame);
+  const [engine, setEngine] = useState(createAppGame);
   const [state, setState] = useState(() => engine.getState());
   const canvas = useRef<HTMLCanvasElement>(null);
   const transport = useRef<{ engine: ReturnType<typeof createGame>; url: string | undefined; client: RuntimeCommandClient } | undefined>(undefined);
   useEffect(() => {
     // Renderer refresh preserves simulation; a simulation edit gets a new history.
-    if (engine.definition !== gameDefinition) { engine.resume({ pending: "discard" }); setEngine(createGame()); }
+    if (engine.definition !== gameDefinition) { engine.resume({ pending: "discard" }); setEngine(createAppGame()); }
   }, [engine, gameDefinition]);
   useEffect(() => { setState(engine.getState()); return engine.subscribe(() => setState(engine.getState())); }, [engine]);
   useEffect(() => {
@@ -53,8 +56,14 @@ export function App() {
   }, []);
   useEffect(() => { audio.current?.update(state); mascot.current?.update(state); }, [state]);
   useEffect(() => {
-    if (import.meta.env.VITE_GAMEINSTANCE_DEV_ENABLED !== "true") return;
-    return registerGameDev(engineDevAdapter(engine));
+    // Loaded only for local development, so the play build never contains the inspector.
+    if (PLAY || import.meta.env.VITE_GAMEINSTANCE_DEV_ENABLED !== "true") return;
+    let unregister: (() => void) | undefined;
+    let disposed = false;
+    void import("@bubbleportal/devtools/browser").then(({ engineDevAdapter, registerGameDev }) => {
+      if (!disposed) unregister = registerGameDev(engineDevAdapter(engine));
+    });
+    return () => { disposed = true; unregister?.(); };
   }, [engine]);
   useEffect(() => {
     let frame = 0; let last = performance.now(); let accumulator = 0;

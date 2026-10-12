@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "projectFormatVersion": 1,
+  "completedMigrations": [
+    "adopt-sdk-guidance-v1",
+    "production-play-build-v1",
+    "single-sdk-entrypoint-v1"
+  ]
+}
