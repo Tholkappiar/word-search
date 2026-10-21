@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0.0",
+  "runtime": {
+    "version": "1.0.0"
+  },
+  "steps": [
+    {
+      "id": "gameplay",
+      "title": "Set up your game",
+      "fields": [
+        {
+          "id": "seconds_per_word",
+          "type": "number",
+          "label": "Seconds per word",
+          "description": "Each hidden word adds this much time to the round.",
+          "required": true,
+          "min": 15,
+          "max": 120,
+          "default": 40
+        },
+        {
+          "id": "celebrate_seconds",
+          "type": "number",
+          "label": "Celebration duration",
+          "description": "Seconds before the next level starts.",
+          "required": true,
+          "min": 3,
+          "max": 20,
+          "default": 6
+        },
+        {
+          "id": "reveal_seconds",
+          "type": "number",
+          "label": "Answer reveal duration",
+          "description": "Seconds to show missed words before retrying.",
+          "required": true,
+          "min": 3,
+          "max": 20,
+          "default": 15
+        },
+        {
+          "id": "final_level",
+          "type": "number",
+          "label": "Final level",
+          "description": "Use 0 to keep playing without a final level.",
+          "required": true,
+          "min": 0,
+          "max": 50,
+          "default": 10
+        }
+      ]
+    },
+    {
+      "id": "audio",
+      "title": "Choose audio levels",
+      "description": "Volume levels range from 0 to 100.",
+      "fields": [
+        {
+          "id": "music_volume",
+          "type": "number",
+          "label": "Music volume",
+          "description": "0 turns music off; 100 is full volume.",
+          "required": true,
+          "min": 0,
+          "max": 100,
+          "default": 50
+        },
+        {
+          "id": "sound_volume",
+          "type": "number",
+          "label": "Sound effects volume",
+          "description": "0 turns sound effects off; 100 is full volume.",
+          "required": true,
+          "min": 0,
+          "max": 100,
+          "default": 70
+        },
+        {
+          "id": "voice_volume",
+          "type": "number",
+          "label": "Host voice volume",
+          "description": "0 turns the host voice off; 100 is full volume.",
+          "required": true,
+          "min": 0,
+          "max": 100,
+          "default": 80
+        }
+      ]
+    }
+  ]
+}

@@ -73,3 +73,25 @@ explicit dependency changes: preserve exact versions, .gamego/sdk.json and the
 frozen lockfile, then rerun game and runtime checks. Installed SDK packages are
 prebuilt; do not rebuild or edit them during ordinary game work. For a requested
 upgrade, use the [sdk-upgrade skill](.agents/skills/bubbleportal-game/SKILL.md).
+
+## Marketplace template
+
+`bubble.config.json` declares runtime v1 setup for round timing, the final level,
+and audio volumes. No API keys or other credentials are required. Defaults match
+the existing game. The browser loads saved installation values from the
+same-origin `/__bubble/config` API before creating the canvas and connecting the
+runtime command client. Settings are not embedded in the build. Local development
+and ordinary runtimes without that API continue to use the existing defaults.
+A failed or malformed configuration shows a retry message and keeps readiness off.
+
+Timing and level values must be whole numbers. Choose final level 0 for endless
+play; audio volume 0 mutes that channel. Runtime controls remain available.
+As before, **Reset** restores the game's original defaults; saved template settings
+apply again on the next launch.
+
+To publish this branch, push it, enter `codex/marketplace-template` in Games →
+Validate a new version, then select **Validate and save version**. Use **Share as
+template** on that validated version. Publishing pins its exact commit and does
+not require merging to `main`. Publishing still requires a public repository and
+the creator's license and rights confirmation. Select this version and complete
+its setup when creating a template stream on a server supporting runtime v1.

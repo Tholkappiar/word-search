@@ -22,3 +22,22 @@ body {
   height: min(100vh, calc(100vw * 1920 / 1080));
   width: min(100vw, calc(100vh * 1080 / 1920));
 }
+
+.startup-message {
+  box-sizing: border-box;
+  max-width: 36rem;
+  margin: auto;
+  padding: 3rem 1.5rem;
+  color: #f2f0e8;
+  font: 1rem/1.6 system-ui, sans-serif;
+}
+.startup-message h1 { font-size: 1.5rem; }
+.startup-message button {
+  padding: .75rem 1.25rem;
+  border: 0;
+  border-radius: .5rem;
+  background: #f2df9d;
+  color: #252015;
+  font: inherit;
+  cursor: pointer;
+}

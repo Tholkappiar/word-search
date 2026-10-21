@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createRuntimeCommandClient, type RuntimeCommandClient } from "@bubbleportal/sdk/browser";
 import { buildRejectedCommandResult } from "@bubbleportal/sdk";
-import { createGame, gameDefinition } from "./game";
+import { createGame, gameDefinition, type GameConfig } from "./game";
 import { renderGame } from "./render";
 import { GameAudio } from "./audio";
 import { Mascot } from "./mascot";
@@ -9,17 +9,21 @@ import "./styles.css";
 
 // `build:play` builds in Vite's "play" mode for streaming: no engine history and no development inspector.
 const PLAY = import.meta.env.MODE === "play";
-const createAppGame = () => createGame({ recordHistory: !PLAY });
+function createAppGame(config: GameConfig) {
+  const engine = createGame({ recordHistory: !PLAY });
+  engine.restart({ config });
+  return engine;
+}
 
-export function App() {
-  const [engine, setEngine] = useState(createAppGame);
+export function App({ startingConfig }: { startingConfig: GameConfig }) {
+  const [engine, setEngine] = useState(() => createAppGame(startingConfig));
   const [state, setState] = useState(() => engine.getState());
   const canvas = useRef<HTMLCanvasElement>(null);
   const transport = useRef<{ engine: ReturnType<typeof createGame>; url: string | undefined; client: RuntimeCommandClient } | undefined>(undefined);
   useEffect(() => {
     // Renderer refresh preserves simulation; a simulation edit gets a new history.
-    if (engine.definition !== gameDefinition) { engine.resume({ pending: "discard" }); setEngine(createAppGame()); }
-  }, [engine, gameDefinition]);
+    if (engine.definition !== gameDefinition) { engine.resume({ pending: "discard" }); setEngine(createAppGame(startingConfig)); }
+  }, [engine, gameDefinition, startingConfig]);
   useEffect(() => { setState(engine.getState()); return engine.subscribe(() => setState(engine.getState())); }, [engine]);
   useEffect(() => {
     const url = import.meta.env.VITE_CONTROL_WS_URL;
